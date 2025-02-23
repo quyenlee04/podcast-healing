@@ -1,0 +1,27 @@
+{
+  "name": "quyenle",
+  "version": "1.0.0",
+  "main": "server",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quyenlee04/podcast-healing.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/quyenlee04/podcast-healing/issues"
+  },
+  "homepage": "https://github.com/quyenlee04/podcast-healing#readme",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.10.1",
+    "multer": "^1.4.5-lts.1"
+  }
+}
