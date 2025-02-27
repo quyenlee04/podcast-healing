@@ -49,10 +49,12 @@ const connectDB = async () => {
 //routes
 // const userRoutes = require('./routes/userRoutes');
 // const podcastRoutes = require('./routes/podcastRoutes');
+// const commentRoutes = require('./routes/commentRoutes');
 // const adminRoutes = require('./routes/adminRoutes');
 
 // app.use('/api/users', userRoutes);
 // app.use('/api/podcasts', podcastRoutes);
+// app.use('/api/comments', commentRoutes);
 // app.use('/api/admin', adminRoutes);
 
 // error handling middleware

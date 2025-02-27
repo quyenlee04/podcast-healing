@@ -1,36 +1,17 @@
-
 const mongoose = require('mongoose');
-const winston = require('winston');
+const { MONGODB_URI } = require('./environment');
 
+const connectDB = async () => {
+  try {
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
+};
 
-class Database{
-    constructor() {
-        this.connection = null;
-    };
-
-    async connect() {
-        try {
-          this.connection = await mongoose.connect(process.env.MONGODB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            serverSelectionTimeoutMS: 5000,
-            retryWrites: true
-          });
-    
-          console.log('MongoDB Connected Successfully');
-          return this.connection;
-        } catch (error) {
-          console.log('MongoDB Connection Error:', error);
-          process.exit(1);
-        }
-      }
-    
-      async disconnect() {
-        if (this.connection) {
-          await mongoose.disconnect();
-          console.log('MongoDB Disconnected');
-        }
-      }
-    }
-    
-    module.exports = new Database();
+module.exports = connectDB;
