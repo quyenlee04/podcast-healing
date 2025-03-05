@@ -4,21 +4,24 @@ const path = require('path');
 // Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, 'uploads/'); // Set the upload folder to 'uploads/'
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    cb(null, `${Date.now()}-${file.originalname}`); // Create a unique filename with timestamp
   }
 });
 
 // File filter
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3'];
-  
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
+  const allowedAudioTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3'];
+  const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+  if (allowedAudioTypes.includes(file.mimetype)) {
+    cb(null, true); // Allow audio files
+  } else if (allowedImageTypes.includes(file.mimetype)) {
+    cb(null, true); // Allow image files
   } else {
-    cb(new Error('Invalid file type. Only audio files are allowed.'), false);
+    cb(new Error('Invalid file type. Only audio and image files are allowed.'), false); // Reject invalid file types
   }
 };
 

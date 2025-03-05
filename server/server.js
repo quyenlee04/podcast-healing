@@ -1,7 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const connectDB = require('./config/database');
+const cloudinary = require('cloudinary').v2;
 const { PORT, NODE_ENV } = require('./config/environment');
 
 // Route imports
@@ -20,6 +22,14 @@ app.use(express.urlencoded({ extended: true }));
 // Connect to Database
 connectDB();
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true
+});
+
+
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/podcasts', podcastRoutes);
@@ -32,6 +42,8 @@ app.use((err, req, res, next) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`Server running in ${NODE_ENV} mode on port ${PORT}`);
+  console.log('Cloudinary Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME);
+
 });
 
 module.exports = app;
