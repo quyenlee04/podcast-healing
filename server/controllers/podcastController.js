@@ -1,10 +1,12 @@
 const Podcast = require('../models/Podcast');
+const Category = require('../models/Category'); // Add this import
 const cloudinary = require('cloudinary').v2;
+const mongoose = require('mongoose');
 const fs = require('fs');
 
 exports.createPodcast = async (req, res) => {
   try {
-    const { title, description, category, duration, tags } = req.body;
+    const { title, description, category, tags, visibility } = req.body;
 
     // Check if files are uploaded
     if (!req.files || !req.files.mp3 || !req.files.coverImage) {
@@ -12,6 +14,27 @@ exports.createPodcast = async (req, res) => {
         error: 'No audio or cover image file uploaded',
         details: 'Please upload both an MP3 file and a cover image'
       });
+    }
+
+    // Validate that category exists
+    if (!category) {
+      return res.status(400).json({
+        error: 'Category is required',
+        details: 'Please select a category for your podcast'
+      });
+    }
+
+    // Find the category by name if a string is provided
+    let categoryId = category;
+    if (category && typeof category === 'string' && !mongoose.Types.ObjectId.isValid(category)) {
+      const categoryDoc = await Category.findOne({ name: category });
+      if (!categoryDoc) {
+        return res.status(400).json({
+          error: 'Invalid category',
+          details: `The category "${category}" does not exist in the database`
+        });
+      }
+      categoryId = categoryDoc._id;
     }
 
     // Access the uploaded files
@@ -44,14 +67,14 @@ exports.createPodcast = async (req, res) => {
       title,
       description,
       author: req.user?._id,
-      filename: audioFile.originalname, // Use audioFile's originalname
+      filename: audioFile.originalname,
       cloudinaryPublicId: cloudinaryAudioResult.public_id,
       audioUrl: cloudinaryAudioResult.secure_url,
-      category,
-      duration: Number(duration),
-      size: audioFile.size, // Use audioFile's size
+      category: categoryId, // Use the resolved category ID
+      size: audioFile.size,
       coverImage: coverImageUrl,
       tags: tags ? tags.split(',') : [],
+      visibility: visibility || 'public',
       metadata: {
         cloudinaryDetails: {
           public_id: cloudinaryAudioResult.public_id,
@@ -79,10 +102,10 @@ exports.createPodcast = async (req, res) => {
     });
   } catch (error) {
     // Remove local files if upload fails
-    if (req.files.mp3 && fs.existsSync(req.files.mp3[0].path)) {
+    if (req.files && req.files.mp3 && fs.existsSync(req.files.mp3[0].path)) {
       fs.unlinkSync(req.files.mp3[0].path);
     }
-    if (req.files.coverImage && fs.existsSync(req.files.coverImage[0].path)) {
+    if (req.files && req.files.coverImage && fs.existsSync(req.files.coverImage[0].path)) {
       fs.unlinkSync(req.files.coverImage[0].path);
     }
 
@@ -103,11 +126,47 @@ exports.createPodcast = async (req, res) => {
 exports.getPodcast = async (req, res) => {
   try {
     const { category, page = 1, limit = 10 } = req.query;
+    const userId = req.user?._id;
 
-    const query = category ? { category } : {};
+    let query = {};
+
+    console.log('Query parameters:', req.query);
+    console.log('User ID:', req.user?._id);
+    
+    // Handle category filtering - convert string name to ObjectId if needed
+    if (category) {
+      if (mongoose.Types.ObjectId.isValid(category)) {
+        query.category = category;
+      } else {
+        // Try to find category by name
+        const categoryDoc = await Category.findOne({ name: category });
+        if (categoryDoc) {
+          query.category = categoryDoc._id;
+        } else {
+          // If category doesn't exist, return empty results
+          return res.json({
+            podcasts: [],
+            totalPages: 0,
+            currentPage: page
+          });
+        }
+      }
+    }
+
+    if (userId) {
+      query.$or = [
+        { visibility: 'public' },
+        { author: userId.toString() }
+      ];
+    } else {
+      query.visibility = 'public';
+    }
+    
+    console.log('Final query:', query);
 
     const podcasts = await Podcast.find(query)
       .populate('author', 'username')
+      .populate('category', 'name image description') // Populate category details
       .skip((page - 1) * limit)
       .limit(Number(limit))
       .sort({ createdAt: -1 });
@@ -132,9 +191,15 @@ exports.getSinglePodcast = async (req, res) => {
   try {
     const podcast = await Podcast.findById(req.params.id)
       .populate('author', 'username')
+      .populate('category', 'name image description') // Populate category details
       .populate('comments.user', 'username');
+    
     if (!podcast) {
       return res.status(404).json({ error: 'Podcast not found' });
+    }
+    if (podcast.visibility === 'private' &&
+      (!req.user || podcast.author._id.toString() !== req.user._id.toString())) {
+      return res.status(403).json({ error: 'Access denied to private podcast' });
     }
     res.json(podcast);
   }
@@ -151,11 +216,15 @@ exports.updatePodcast = async (req, res) => {
     if (!podcast) {
       return res.status(404).json({ message: 'Podcast not found' });
     }
+    if (podcast.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'You are not authorized to update this podcast' });
+    }
     podcast.title = title;
     podcast.description = description;
     podcast.category = category;
     podcast.duration = duration;
     podcast.coverImage = coverImage;
+    podcast.visibility = visibility || podcast.visibility;
     podcast.tags = tags ? tags.split(',') : podcast.tags;
     await podcast.save();
     res.json({
@@ -229,6 +298,7 @@ exports.addComment = async (req, res) => {
     }
 
     const newComment = {
+      id: req.params.id,
       user: req.user._id,
       text,
       createdAt: new Date()

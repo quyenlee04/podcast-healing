@@ -29,16 +29,21 @@ const PodcastSchema = new mongoose.Schema({
     required: [true, 'Audio URL is required']
   },
   category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
+    required: true
+  },
+  visibility: {
     type: String,
-    enum: ['Technology', 'Science', 'Business', 'Entertainment', 'Sports'],
-    required: true
+    enum: ['public', 'private'],
+    default: 'public'
   },
-  duration: {
-    type: Number, 
-    required: true
-  },
+  // duration: {
+  //   type: Number, 
+  //   required: true
+  // },
   size: {
-    type: Number, 
+    type: Number,
     default: 0
   },
   coverImage: {

@@ -41,6 +41,10 @@ const adminOnly = (req, res, next) => {
   }
 };
 
+// Add this function to your existing authMiddleware file
+
+
+
 module.exports = {
   protect,
   adminOnly

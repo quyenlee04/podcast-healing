@@ -9,6 +9,7 @@ const { PORT, NODE_ENV } = require('./config/environment');
 // Route imports
 const userRoutes = require('./routes/userRoutes');
 const podcastRoutes = require('./routes/podcastRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 
 // Initialize app
 const app = express();
@@ -33,6 +34,7 @@ cloudinary.config({
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/podcasts', podcastRoutes);
+app.use('/api/categories', categoryRoutes);
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
