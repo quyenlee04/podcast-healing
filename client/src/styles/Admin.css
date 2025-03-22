@@ -1,0 +1,37 @@
+  /* Global styles for admin pages */
+  .admin-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #1e1e2f; /* Màu nền đen nhạt */
+    color: #cce7ff; /* Màu chữ xanh dương pastel */
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.admin-container h2 {
+    color: #75aadb; /* Màu xanh dương pastel đậm hơn */
+    border-bottom: 2px solid #75aadb;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.admin-container p {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.admin-container button {
+    background-color: #75aadb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.admin-container button:hover {
+    background-color: #5a8dbd;
+}

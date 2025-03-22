@@ -1,0 +1,95 @@
+/* Reset background */
+body {
+  background-color: #121212; /* Màu nền tối */
+  color: #ffffff; /* Chữ trắng */
+  font-family: Arial, sans-serif;
+}
+
+/* Thẻ chứa nội dung chính */
+.main-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+/* Các thẻ podcast */
+.podcast-card {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out;
+}
+
+.podcast-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Tiêu đề podcast */
+.podcast-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Thông tin phụ */
+.podcast-info {
+  font-size: 14px;
+  color: #bbb;
+  margin-top: 5px;
+}
+
+/* Nút bấm */
+.button {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.button:hover {
+  background-color: #444;
+}
+
+/* Ẩn background cũ nếu có */
+.background-image {
+  display: none;
+}
+/* Định dạng chung */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Phần nội dung chính */
+.main-content {
+  display: flex;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+/* Khi Sidebar mở */
+.sidebar-open .content {
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Khi Sidebar đóng */
+.sidebar-closed .content {
+  margin-left: 60px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  transition: width 0.3s ease;
+}
+
+.sidebar.closed {
+  width: 60px;
+}

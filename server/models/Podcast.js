@@ -19,10 +19,9 @@ const PodcastSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Filename is required']
   },
-  cloudinaryPublicId: {
+  filePath: {
     type: String,
-    required: [true, 'Cloudinary public ID is required'],
-    unique: true
+    required: [true, 'File path is required']
   },
   audioUrl: {
     type: String,
@@ -38,17 +37,16 @@ const PodcastSchema = new mongoose.Schema({
     enum: ['public', 'private'],
     default: 'public'
   },
-  // duration: {
-  //   type: Number, 
-  //   required: true
-  // },
   size: {
     type: Number,
     default: 0
   },
   coverImage: {
     type: String,
-    default: 'https://avatar.iran.liara.run/public/boy?username=Ash'
+    default: '/uploads/default/default-cover.jpg'
+  },
+  coverImagePath: {
+    type: String
   },
   tags: [String],
   likes: [{

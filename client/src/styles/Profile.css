@@ -1,0 +1,49 @@
+/* ====== Profile Page ====== */
+.profile-container {
+    text-align: center;
+    padding: 30px;
+    max-width: 600px;
+    margin: auto;
+    background: var(--secondary-color);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  }
+  
+  .profile-container h2 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+  }
+  
+  .profile-container img {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    border: 3px solid var(--primary-color);
+    margin-bottom: 15px;
+  }
+  
+  .profile-details {
+    text-align: left;
+    margin-top: 15px;
+  }
+  
+  .profile-details p {
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-bottom: 10px;
+  }
+  
+  .edit-profile-btn {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px;
+    transition: 0.3s;
+  }
+  
+  .edit-profile-btn:hover {
+    background-color: var(--hover-color);
+  }

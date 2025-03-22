@@ -23,4 +23,4 @@ TestResults.xml
 
 node_modules
 .env
-server/uploads
+server/public

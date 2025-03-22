@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const { generateToken } = require('../config/auth');
 const { profile } = require('winston');
+const fs = require('fs');
+const path = require('path');
 
 
 exports.register = async (req, res) => {
@@ -174,5 +176,80 @@ exports.getAllUsers = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Update profile with avatar upload
+exports.updateProfile = async (req, res) => {
+  try {
+    const { firstName, lastName, bio } = req.body;
+    const user = await User.findById(req.user._id);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Initialize profile if it doesn't exist
+    if (!user.profile) {
+      user.profile = {};
+    }
+    
+    // Update profile fields
+    if (firstName) user.profile.firstName = firstName;
+    if (lastName) user.profile.lastName = lastName;
+    if (bio) user.profile.bio = bio;
+    
+    // Handle avatar upload
+    if (req.file) {
+      // Delete old avatar if exists
+      if (user.profile.avatarPath && fs.existsSync(user.profile.avatarPath)) {
+        fs.unlinkSync(user.profile.avatarPath);
+      }
+      
+      const avatarFileName = `avatar-${user._id}-${Date.now()}${path.extname(req.file.originalname)}`;
+      const avatarDir = path.join(__dirname, '../public/uploads/avatars');
+      
+      // Create directory if it doesn't exist
+      if (!fs.existsSync(avatarDir)) {
+        fs.mkdirSync(avatarDir, { recursive: true });
+      }
+      
+      // Define full path for the file
+      const avatarPath = path.join(avatarDir, avatarFileName);
+      
+      // Move file from temp upload location to permanent storage
+      fs.renameSync(req.file.path, avatarPath);
+      
+      // Update user profile with avatar info
+      user.profile.avatar = `/uploads/avatars/${avatarFileName}`;
+      user.profile.avatarPath = avatarPath;
+    }
+    
+    await user.save();
+    
+    // Don't send sensitive info back
+    const userResponse = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      profile: user.profile,
+      favorites: user.favorites
+    };
+    
+    res.json({
+      message: 'Profile updated successfully',
+      user: userResponse
+    });
+  } catch (error) {
+    // Clean up uploaded file if there was an error
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    
+    res.status(500).json({ 
+      message: 'Error updating profile', 
+      error: error.message 
+    });
   }
 };

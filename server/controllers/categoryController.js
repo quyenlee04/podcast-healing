@@ -1,6 +1,6 @@
 const Category = require('../models/Category');
-const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
+const path = require('path');
 
 // Get all categories
 exports.getAllCategories = async (req, res) => {
@@ -42,30 +42,37 @@ exports.createCategory = async (req, res) => {
       return res.status(400).json({ message: 'Category already exists' });
     }
     
+    let imagePath = '';
     let imageUrl = '';
-    let cloudinaryPublicId = '';
     
-    // Upload image to Cloudinary if provided
+    // Handle image upload
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        resource_type: 'image',
-        folder: 'category_images',
-        use_filename: true,
-        unique_filename: false
-      });
+      const imageFileName = `category-${Date.now()}-${path.basename(req.file.originalname)}`;
+      const imageDir = path.join(__dirname, '../public/uploads/categories');
       
-      imageUrl = result.secure_url;
-      cloudinaryPublicId = result.public_id;
+      // Create directory if it doesn't exist
+      if (!fs.existsSync(imageDir)) {
+        fs.mkdirSync(imageDir, { recursive: true });
+      }
       
-      // Remove local file after upload
+      // Define full path for the file
+      imagePath = path.join(imageDir, imageFileName);
+      
+      // Move file from temp upload location to permanent storage
+      fs.copyFileSync(req.file.path, imagePath);
+      
+      // Create URL for accessing the file
+      imageUrl = `/uploads/categories/${imageFileName}`;
+      
+      // Remove temp file
       fs.unlinkSync(req.file.path);
     }
     
     const newCategory = new Category({
       name,
       description,
-      image: imageUrl || undefined,
-      cloudinaryPublicId: cloudinaryPublicId || undefined
+      image: imageUrl || '/uploads/default/default-category.jpg',
+      imagePath: imagePath
     });
     
     await newCategory.save();
@@ -98,23 +105,33 @@ exports.updateCategory = async (req, res) => {
     
     // Update image if provided
     if (req.file) {
-      // Delete old image from Cloudinary if exists
-      if (category.cloudinaryPublicId) {
-        await cloudinary.uploader.destroy(category.cloudinaryPublicId);
+      // Delete old image if exists
+      if (category.imagePath && fs.existsSync(category.imagePath)) {
+        fs.unlinkSync(category.imagePath);
       }
       
-      // Upload new image
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        resource_type: 'image',
-        folder: 'category_images',
-        use_filename: true,
-        unique_filename: false
-      });
+      const imageFileName = `category-${Date.now()}-${path.basename(req.file.originalname)}`;
+      const imageDir = path.join(__dirname, '../public/uploads/categories');
       
-      category.image = result.secure_url;
-      category.cloudinaryPublicId = result.public_id;
+      // Create directory if it doesn't exist
+      if (!fs.existsSync(imageDir)) {
+        fs.mkdirSync(imageDir, { recursive: true });
+      }
       
-      // Remove local file after upload
+      // Define full path for the file
+      const imagePath = path.join(imageDir, imageFileName);
+      
+      // Move file from temp upload location to permanent storage
+      fs.copyFileSync(req.file.path, imagePath);
+      
+      // Create URL for accessing the file
+      const imageUrl = `/uploads/categories/${imageFileName}`;
+      
+      // Update category with new image info
+      category.image = imageUrl;
+      category.imagePath = imagePath;
+      
+      // Remove temp file
       fs.unlinkSync(req.file.path);
     }
     
@@ -149,9 +166,9 @@ exports.deleteCategory = async (req, res) => {
       return res.status(404).json({ message: 'Category not found' });
     }
     
-    // Delete image from Cloudinary if exists
-    if (category.cloudinaryPublicId) {
-      await cloudinary.uploader.destroy(category.cloudinaryPublicId);
+    // Delete image if exists
+    if (category.imagePath && fs.existsSync(category.imagePath)) {
+      fs.unlinkSync(category.imagePath);
     }
     
     await Category.findByIdAndDelete(req.params.id);

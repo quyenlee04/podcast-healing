@@ -29,7 +29,9 @@ const UserSchema = new mongoose.Schema({
   profile: {
     firstName: String,
     lastName: String,
-    avatar: String
+    avatar: String,
+    avatarPath: String, // Store the physical file path
+    bio: String
   },
   favorites: [{
     type: mongoose.Schema.Types.ObjectId,

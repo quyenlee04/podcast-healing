@@ -1,9 +1,12 @@
+const fs = require('fs');
+const setupDefaultFiles = require('./utils/setupDefaults');
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const path = require('path');
 const connectDB = require('./config/database');
-const cloudinary = require('cloudinary').v2;
 const { PORT, NODE_ENV } = require('./config/environment');
 
 // Route imports
@@ -15,21 +18,67 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(helmet());
+app.use(cors({
+  origin: 'http://localhost:3000', // Your React app's origin
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' } // Important for images
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Set up default files
+setupDefaultFiles();
+
+const publicDir = path.join(__dirname, 'public');
+const uploadsDir = path.join(__dirname, 'public/uploads');
+const podcastsDir = path.join(__dirname, 'public/uploads/podcasts');
+const coversDir = path.join(__dirname, 'public/uploads/covers');
+const categoriesDir = path.join(__dirname, 'public/uploads/categories');
+const defaultDir = path.join(__dirname, 'public/uploads/default');
+
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir);
+}
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+if (!fs.existsSync(podcastsDir)) {
+  fs.mkdirSync(podcastsDir);
+}
+if (!fs.existsSync(coversDir)) {
+  fs.mkdirSync(coversDir);
+}
+if (!fs.existsSync(categoriesDir)) {
+  fs.mkdirSync(categoriesDir);
+}
+if (!fs.existsSync(defaultDir)) {
+  fs.mkdirSync(defaultDir, { recursive: true });
+}
+// Serve static files from the public directory
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'), {
+  setHeaders: (res) => {
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.set('Access-Control-Allow-Methods', 'GET');
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
+
+// Also serve the entire public directory
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res) => {
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.set('Access-Control-Allow-Methods', 'GET');
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
 // Connect to Database
 connectDB();
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true
-});
-
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -44,7 +93,7 @@ app.use((err, req, res, next) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`Server running in ${NODE_ENV} mode on port ${PORT}`);
-  console.log('Cloudinary Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME);
+
 
 });
 

@@ -1,0 +1,33 @@
+.profile-page {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .tabs button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    background: #ddd;
+    border-radius: 5px;
+    transition: 0.3s;
+  }
+  
+  .tabs button.active {
+    background: #007bff;
+    color: white;
+  }
+  
+  .tab-content {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  

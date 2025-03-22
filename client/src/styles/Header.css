@@ -1,0 +1,142 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #121212;
+    color: white;
+}
+
+/* Căn giữa logo và thanh tìm kiếm */
+.header-center {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Khoảng cách giữa logo và search bar */
+    flex-grow: 1; /* Chiếm không gian trung tâm */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+}
+
+/* Logo */
+.logo-link {
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    height: 50px;
+    width: 50px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+}
+
+
+/* Thanh tìm kiếm */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #242424;  
+    width: 100%;
+    max-width: 500px; /* Tăng chiều dài lên */
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.search-icon {
+    color: rgb(29, 215, 240);
+    margin-right: 8px;
+}
+
+.search-bar input {
+    background: none;
+    border: none;
+    outline: none;
+    color: rgb(29, 215, 240);
+    font-size: 16px;
+}
+
+/* Điều chỉnh khoảng cách với Navigation */
+.header-right {
+    display: flex;
+    gap: 15px;
+}
+
+
+/* Header Right (Explore, Admin, Register, Log in) */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-right a {
+    text-decoration: none;
+    color: rgb(29, 215, 240);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.header-right a:last-child {
+    background: rgb(29, 215, 240);
+    color: black;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+.header-right a:hover {
+    color: #f8f8f8;
+}
+
+.sidebar-container {
+    position: relative;
+}
+
+.menu-icon {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+
+/* Add these styles to your existing Header.css file */
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.user-icon {
+    font-size: 1.2rem;
+}
+
+.logout-btn {
+    background-color: transparent;
+    border: 1px solid #e45454;
+    color: #e45454;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #e45454;
+    color: white;
+}
+
+/* Make sure the header-right has proper spacing */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}

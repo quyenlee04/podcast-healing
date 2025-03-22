@@ -13,11 +13,10 @@ const CategorySchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    default: 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg'
+    default: '/uploads/default/default-category.jpg'
   },
-  cloudinaryPublicId: {
-    type: String,
-    default: ''
+  imagePath: {
+    type: String
   },
   active: {
     type: Boolean,

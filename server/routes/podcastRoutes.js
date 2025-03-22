@@ -3,54 +3,82 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const podcastController = require('../controllers/podcastController');
-const authMiddleware = require('../middleware/authMiddleware');
+const {createPodcast, getPodcast, getSinglePodcast, updatePodcast, deletePodcast, toggleLike, addComment, deleteComment } = require('../controllers/podcastController');
+const { protect } = require('../middleware/authMiddleware');
 
-
-
+// Set up multer storage for uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir);
+    let uploadDir;
+    
+    // Set different directories based on file type
+    if (file.fieldname === 'mp3') {
+      uploadDir = path.join(__dirname, '../public/uploads/podcasts');
+    } else if (file.fieldname === 'coverImage') {
+      uploadDir = path.join(__dirname, '../public/uploads/covers');
+    } else {
+      uploadDir = path.join(__dirname, '../public/uploads');
     }
+    
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    
     cb(null, uploadDir);
   },
-  filename: (req, files, cb) => {
+  filename: (req, file, cb) => {
+    const cleanFileName = file.originalname.replace(/[^a-zA-Z0-9.]/g, '');
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, files.fieldname + '-' + uniqueSuffix + path.extname(files.originalname));
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(cleanFileName));
   }
 });
 
-const upload = multer({
-  storage: storage,
-  fileFilter: (req, files, cb) => {
-    const ext = path.extname(files.originalname).toLowerCase();
-    if (ext !== '.mp3' && ext !== '.jpg' && ext !== '.jpeg' && ext !== '.png') {
-      return cb(new Error('Only MP3 and image files are allowed'), false);
+// File filter
+const fileFilter = (req, file, cb) => {
+  if (file.fieldname === 'mp3') {
+    // For audio files
+    const allowedTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid audio file type. Only MP3 and WAV are allowed.'), false);
     }
-    cb(null, true);
-  },
+  } else if (file.fieldname === 'coverImage') {
+    // For image files
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid image file type. Only JPG, PNG and WebP are allowed.'), false);
+    }
+  } else {
+    cb(new Error('Unexpected field'), false);
+  }
+};
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter,
   limits: {
-    fileSize: 50 * 1024 * 1024 // 50MB file size limit
+    fileSize: 50 * 1024 * 1024 // 50MB limit
   }
 });
 
-router.post('/create', 
-  authMiddleware.protect, 
-  upload.fields([
-    { name: 'mp3', maxCount: 1 },
-    { name: 'coverImage', maxCount: 1 }
-  ]),
-  podcastController.createPodcast
-);
-router.get('/', authMiddleware.protect, podcastController.getPodcast);
-router.get('/:id', authMiddleware.protect, podcastController.getSinglePodcast);
-router.put('/:id', authMiddleware.protect, podcastController.updatePodcast);
-router.delete('/:id', authMiddleware.protect, podcastController.deletePodcast);
+// Set up the fields for upload
+const uploadFields = upload.fields([
+  { name: 'mp3', maxCount: 1 },
+  { name: 'coverImage', maxCount: 1 }
+]);
 
-router.post('/:id/like', authMiddleware.protect, podcastController.toggleLike);
-router.post('/:id/comments', authMiddleware.protect, podcastController.addComment);
-router.delete('/:id/comments/:commentId', authMiddleware.protect, podcastController.deleteComment);
+// Routes
+router.post('/', protect, uploadFields, createPodcast);
+router.get('/', getPodcast);
+router.get('/:id', getSinglePodcast);
+router.put('/:id', protect, uploadFields, updatePodcast);
+router.delete('/:id', protect, deletePodcast);
+router.post('/:id/like', protect, toggleLike);
+router.post('/:id/comment', protect, addComment);
+router.delete('/:id/comment/:commentId', protect, deleteComment);
 
 module.exports = router;

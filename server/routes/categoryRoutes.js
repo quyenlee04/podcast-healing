@@ -3,8 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const categoryController = require('../controllers/categoryController');
-const authMiddleware = require('../middleware/authMiddleware');
+const {getCategory, getAllCategories, updateCategory, createCategory, deleteCategory} = require('../controllers/categoryController');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
 
 
@@ -38,25 +37,22 @@ const upload = multer({
 });
 
 // Public routes
-router.get('/', categoryController.getAllCategories);
-router.get('/:id', categoryController.getCategory);
+router.get('/', getAllCategories);
+router.get('/:id', getCategory);
 
 // Protected routes (admin only)
 router.post('/',
     protect, adminOnly,
-    upload.single('image'),
-    categoryController.createCategory
+    upload.single('image'),createCategory
 );
 
 router.put('/:id',
     protect, adminOnly,
-    upload.single('image'),
-    categoryController.updateCategory
+    upload.single('image'), updateCategory
 );
 
 router.delete('/:id',
-    protect, adminOnly,
-    categoryController.deleteCategory
+    protect, adminOnly, deleteCategory
 );
 
 module.exports = router;

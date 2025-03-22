@@ -1,0 +1,98 @@
+/* Căn giữa form */
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #048d1b;
+  }
+  
+  /* Thiết kế form */
+  .register-form {
+    background: #3fc5be;
+    padding: 90px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 350px;
+  }
+  
+  /* Căn giữa logo */
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  
+  .logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  /* Tiêu đề */
+  .register-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #048d1b;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  
+  /* Ô nhập */
+  .input-group {
+    display: flex;
+    align-items: center;
+    background: #f9f9f9;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .input-group .icon {
+    color: #b40404;
+    margin-right: 10px;
+  }
+  
+  .input-group input {
+    border: none;
+    background: none;
+    width: 100%;
+    outline: none;
+    font-size: 16px;
+  }
+  
+  /* Nút đăng ký */
+  .register-btn {
+    background-color: #07881c;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    font-size: 16px;    
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .register-btn:hover {
+    background-color: #03580b;
+  }
+  
+  /* Link đăng nhập */
+  .login-link {
+    margin-top: 10px;
+    font-size: 16px;
+  }
+  
+  .login-link a {
+    color: #e45454;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .login-link a:hover {
+    text-decoration: underline;
+  }
+  
