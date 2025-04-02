@@ -1,0 +1,90 @@
+.popular-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.popular-page h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.popular-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.popular-item {
+  position: relative;
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.popular-item:hover {
+  transform: translateY(-5px);
+}
+
+.rank-badge {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  z-index: 1;
+  color: white;
+}
+
+.rank-1 {
+  background: linear-gradient(135deg, #ffd700, #ffa500);
+  font-size: 1.2rem;
+  width: 45px;
+  height: 45px;
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, #CD7F32, #8B4513);
+}
+
+.listen-count {
+  text-align: center;
+  color: #666;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .popular-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.error-container {
+  text-align: center;
+  color: #dc3545;
+  padding: 2rem;
+}

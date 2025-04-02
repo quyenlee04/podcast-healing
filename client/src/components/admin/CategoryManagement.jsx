@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from "react";
-import authService from "../../services/authService";
+import categoryService from "../../services/categoryService";
 
-const UserManagement = () => {
-  const [users, setUsers] = useState([]);
+const CategoryManagement = () => {
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingUser, setEditingUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    role: 'user'
+    name: '',
+    description: '',
+    image: null
   });
 
   useEffect(() => {
-    fetchUsers();
+    fetchCategories();
   }, []);
 
-  const fetchUsers = async () => {
+  const fetchCategories = async () => {
     try {
-      const response = await authService.getAllUsers();
-      setUsers(response.users);
+      const response = await categoryService.getCategories();
+      setCategories(response || []);
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -29,21 +28,36 @@ const UserManagement = () => {
   };
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value, files } = e.target;
+    if (files) {
+      setFormData({
+        ...formData,
+        [name]: files[0]
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (editingUser) {
-        await authService.updateUser(editingUser.id, formData);
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (formData[key]) {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+
+      if (editingCategory) {
+        await categoryService.updateCategory(editingCategory._id, formDataToSend);
       } else {
-        await authService.register(formData);
+        await categoryService.createCategory(formDataToSend);
       }
-      fetchUsers();
+      fetchCategories();
       handleCloseModal();
     } catch (err) {
       console.error(err);
@@ -51,22 +65,20 @@ const UserManagement = () => {
     }
   };
 
-  const handleEdit = (user) => {
-    setEditingUser(user);
+  const handleEdit = (category) => {
+    setEditingCategory(category);
     setFormData({
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      password: '' // Clear password for editing
+      name: category.name,
+      description: category.description || ''
     });
     setShowModal(true);
   };
 
-  const handleDelete = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+  const handleDelete = async (categoryId) => {
+    if (window.confirm('Are you sure you want to delete this category?')) {
       try {
-        await authService.deleteUser(userId);
-        fetchUsers();
+        await categoryService.deleteCategory(categoryId);
+        fetchCategories();
       } catch (err) {
         console.error(err);
         alert(err.message);
@@ -76,8 +88,8 @@ const UserManagement = () => {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setEditingUser(null);
-    setFormData({ username: '', email: '', password: '', role: 'user' });
+    setEditingCategory(null);
+    setFormData({ name: '', description: '', image: null });
   };
 
   if (loading) {
@@ -93,44 +105,49 @@ const UserManagement = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="mb-0">User Management</h2>
+        <h2 className="mb-0">Category Management</h2>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-          <i className="bi bi-plus-lg me-2"></i>Add User
+          <i className="bi bi-plus-lg me-2"></i>Add Category
         </button>
       </div>
 
-      {/* User Table */}
+      {/* Category Table */}
       <div className="table-responsive">
         <table className="table table-dark table-hover">
           <thead>
             <tr>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Image</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
-              <tr key={user.id}>
-                <td>{user.username}</td>
-                <td>{user.email}</td>
+            {categories.map(category => (
+              <tr key={category._id}>
+                <td>{category.name}</td>
+                <td>{category.description}</td>
                 <td>
-                  <span className={`badge ${user.role === 'admin' ? 'bg-danger' : 'bg-info'}`}>
-                    {user.role}
-                  </span>
+                  {category.image && (
+                    <img 
+                      src={category.image} 
+                      alt={category.name} 
+                      style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                      className="rounded"
+                    />
+                  )}
                 </td>
                 <td>
                   <div className="btn-group">
                     <button 
                       className="btn btn-sm btn-outline-info"
-                      onClick={() => handleEdit(user)}
+                      onClick={() => handleEdit(category)}
                     >
                       <i className="bi bi-pencil"></i>
                     </button>
                     <button 
                       className="btn btn-sm btn-outline-danger"
-                      onClick={() => handleDelete(user.id)}
+                      onClick={() => handleDelete(category._id)}
                     >
                       <i className="bi bi-trash"></i>
                     </button>
@@ -147,62 +164,49 @@ const UserManagement = () => {
         <div className="modal-dialog">
           <div className="modal-content bg-dark text-light">
             <div className="modal-header">
-              <h5 className="modal-title">{editingUser ? 'Edit User' : 'Add User'}</h5>
+              <h5 className="modal-title">{editingCategory ? 'Edit Category' : 'Add Category'}</h5>
               <button type="button" className="btn-close btn-close-white" onClick={handleCloseModal}></button>
             </div>
             <div className="modal-body">
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label">Username</label>
+                  <label className="form-label">Name</label>
                   <input
                     type="text"
                     className="form-control"
-                    name="username"
-                    value={formData.username}
+                    name="name"
+                    value={formData.name}
                     onChange={handleInputChange}
                     required
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Email</label>
-                  <input
-                    type="email"
+                  <label className="form-label">Description</label>
+                  <textarea
                     className="form-control"
-                    name="email"
-                    value={formData.email}
+                    name="description"
+                    value={formData.description}
                     onChange={handleInputChange}
-                    required
+                    rows="3"
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Password</label>
+                  <label className="form-label">Image</label>
                   <input
-                    type="password"
+                    type="file"
                     className="form-control"
-                    name="password"
-                    value={formData.password}
+                    name="image"
+                    accept="image/*"
                     onChange={handleInputChange}
-                    required={!editingUser}
+                    required={!editingCategory}
                   />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Role</label>
-                  <select
-                    className="form-select"
-                    name="role"
-                    value={formData.role}
-                    onChange={handleInputChange}
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
                     Cancel
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    {editingUser ? 'Update' : 'Add'}
+                    {editingCategory ? 'Update' : 'Add'}
                   </button>
                 </div>
               </form>
@@ -215,4 +219,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement;
+export default CategoryManagement;

@@ -432,6 +432,36 @@ exports.deleteComment = async (req, res) => {
     res.status(500).json({ message: 'Error deleting comment', error: error.message });
   }
 };
+exports.incrementListenCount = async (req, res) => {
+  try {
+    const podcast = await Podcast.findById(req.params.id);
+    if (!podcast) {
+      return res.status(404).json({ message: 'Podcast not found' });
+    }
+    
+    await podcast.incrementListenCount();
+    
+    res.json({ message: 'Listen count incremented', listenCount: podcast.listenCount });
+  } catch (error) {
+    console.error('Error incrementing listen count:', error);
+    res.status(500).json({ message: 'Failed to increment listen count' });
+  }
+};
+exports.getPopularPodcasts = async (req, res) => {
+  try {
+    const podcasts = await Podcast.find({ visibility: 'public' })
+      .populate('author', 'username')
+      .populate('category')
+      .sort({ listenCount: -1 }) // Ensure proper sorting by listen count
+      .limit(3);
 
-// Remove this comment as it's no longer needed
-// Keep other functions the same, just update these two
+    res.json({
+      podcasts
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error fetching popular podcasts',
+      error: error.message
+    });
+  }
+};

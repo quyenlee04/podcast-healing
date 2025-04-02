@@ -72,9 +72,15 @@ const PodcastSchema = new mongoose.Schema({
   metadata: {
     type: Object,
     default: {}
+  }, listenCount: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true
 });
-
+PodcastSchema.methods.incrementListenCount = function() {
+  this.listenCount = (this.listenCount || 0) + 1;
+  return this.save();
+};
 module.exports = mongoose.model('Podcast', PodcastSchema);

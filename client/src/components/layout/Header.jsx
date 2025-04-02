@@ -1,14 +1,21 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { FaSearch, FaUser } from "react-icons/fa";
+import { FaSearch, FaUser, FaBars } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
 import "../../styles/Header.css";
 
-const Header = () => {
+const Header = ({ toggleSidebar }) => {
     const { user, logout } = useContext(AuthContext);
 
     return (
         <header className="header">
+            
+            <div className="sidebar-toggle">
+                <button onClick={toggleSidebar} className="toggle-button">
+                    <FaBars />
+                </button>
+            </div>
+            
             {/* Logo và Search Bar ở giữa */}
             <div className="header-center">
                 {/* Logo */}
@@ -25,7 +32,11 @@ const Header = () => {
 
             {/* Navigation links */}
             <nav className="header-right">
-                <Link to="/admin">Admin</Link>
+                {user && user.role === 'admin' && (
+                    <Link to="/admin" className="admin-link">
+                        Admin Dashboard
+                    </Link>
+                )}
                 
                 {user ? (
                     <div className="user-menu">

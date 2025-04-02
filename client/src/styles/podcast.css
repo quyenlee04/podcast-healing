@@ -387,3 +387,238 @@
     width: 100%;
   }
 }
+
+/* Add these styles to your existing podcast.css file */
+
+.play-podcast-btn {
+  background: #f50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.play-podcast-btn:hover {
+  background: #f70;
+}
+
+.play-podcast-btn.playing {
+  background: #333;
+}
+
+.play-podcast-btn.playing:hover {
+  background: #444;
+}
+
+.related-podcasts {
+  margin-top: 3rem;
+}
+
+.related-podcasts h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.related-podcasts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.related-podcast-card {
+  background: #f9f9f9;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.related-podcast-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.related-podcast-cover {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.related-podcast-info {
+  padding: 12px;
+}
+
+.related-podcast-info h3 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.play-related-btn {
+  background: transparent;
+  color: #f50;
+  border: 1px solid #f50;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.play-related-btn:hover {
+  background: #f50;
+  color: white;
+}
+
+/* Add these styles for the play buttons in the podcast list */
+.podcast-card-image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.podcast-play-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: #f50;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.9;
+  z-index: 2;
+}
+
+.podcast-play-button:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.podcast-play-button.playing {
+  background: #333;
+}
+
+.podcast-card:hover .podcast-play-button {
+  opacity: 1;
+}
+
+.podcast-listen-count {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.podcast-listen-count i {
+  font-size: 1rem;
+}
+
+/* Make sure the listen count stays visible on hover */
+.podcast-card:hover .podcast-listen-count {
+  opacity: 1;
+}
+
+/* Upload Podcast Form Styles */
+.upload-podcast-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.upload-podcast-container h2 {
+  color: #333;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.file-input-wrapper {
+  position: relative;
+  margin-top: 1rem;
+}
+
+.file-preview {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.upload-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background: #4a6cf7;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.upload-btn:hover {
+  background: #3451b2;
+}
+
+.upload-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+.alert-danger {
+  background: #fee;
+  color: #c00;
+  border: 1px solid #fcc;
+}

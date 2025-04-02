@@ -1,37 +1,192 @@
-  /* Global styles for admin pages */
-  .admin-container {
-    max-width: 1200px;
-    margin: 20px auto;
+.admin-dashboard {
+    background-color: #1e1e2f;
+    min-height: 100vh;
     padding: 20px;
-    background-color: #1e1e2f; /* Màu nền đen nhạt */
-    color: #cce7ff; /* Màu chữ xanh dương pastel */
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    color: #cce7ff;
 }
 
-.admin-container h2 {
-    color: #75aadb; /* Màu xanh dương pastel đậm hơn */
-    border-bottom: 2px solid #75aadb;
-    padding-bottom: 10px;
+.admin-header {
+    background-color: #2a2a40;
+    padding: 20px;
+    border-radius: 8px;
     margin-bottom: 20px;
 }
 
-.admin-container p {
-    font-size: 16px;
-    line-height: 1.5;
+.admin-header h1 {
+    color: rgb(29, 215, 240);
+    margin-bottom: 20px;
 }
 
-.admin-container button {
-    background-color: #75aadb;
-    color: white;
+.admin-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    background-color: #3a3a50;
+    color: #cce7ff;
     border: none;
     padding: 10px 20px;
-    margin-top: 10px;
+    border-radius: 4px;
     cursor: pointer;
-    border-radius: 5px;
-    font-weight: bold;
+    transition: all 0.3s ease;
 }
 
-.admin-container button:hover {
-    background-color: #5a8dbd;
+.tab-btn.active {
+    background-color: rgb(29, 215, 240);
+    color: #1e1e2f;
+}
+
+.admin-content {
+    background-color: #2a2a40;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Table styles */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #3a3a50;
+}
+
+.admin-table th {
+    background-color: #3a3a50;
+    color: rgb(29, 215, 240);
+}
+
+.admin-table tr:hover {
+    background-color: #3a3a50;
+}
+
+
+.admin-dashboard {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  min-height: 100vh;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  padding: 20px;
+}
+
+.admin-sidebar .nav-link {
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 10px;
+  border-radius: 8px;
+  padding: 12px 20px;
+  transition: all 0.3s ease;
+}
+
+.admin-sidebar .nav-link:hover {
+  background-color: rgba(255,255,255,0.1);
+  color: #fff;
+  transform: translateX(5px);
+}
+
+.admin-sidebar .nav-link.active {
+  background-color: #fff;
+  color: #6a11cb;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.admin-main {
+  background-color: #f8f9fa;
+  padding: 30px;
+}
+
+.card {
+  background-color: #fff;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 20px;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  border-top: none;
+  color: #6a11cb;
+  font-weight: 600;
+  padding: 15px;
+}
+
+.table td {
+  padding: 15px;
+  vertical-align: middle;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
+}
+
+.badge {
+  padding: 8px 12px;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.badge.bg-success {
+  background: linear-gradient(135deg, #1dc88a 0%, #17a2b8 100%) !important;
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
+}
+
+.modal-content {
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+  border-bottom: 1px solid #eee;
+  padding: 20px;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.form-control {
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #eee;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+  border-color: #6a11cb;
+}
+
+.btn-group .btn {
+  margin: 0 5px;
+  border-radius: 6px;
 }

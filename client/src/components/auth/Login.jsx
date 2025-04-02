@@ -1,9 +1,10 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUser, FaLock } from "react-icons/fa";
 import authService from "../../services/authService";
 import { AuthContext } from "../../context/AuthContext";
 import "../../styles/Login.css";
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ username: "", password: "" });
@@ -16,6 +17,10 @@ const Login = () => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const redirectPath = searchParams.get('redirect') || '/';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -23,10 +28,11 @@ const Login = () => {
     try {
       const response = await authService.login(credentials);
       setUser(response.user);
-      navigate("/");
+      toast.success('Login successful!');
+      navigate(redirectPath);
     } catch (err) {
       setError(err.message || "Login failed. Please check your credentials.");
-      console.error("Login error:", err);
+      toast.error(err.message || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }

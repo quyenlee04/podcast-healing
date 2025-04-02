@@ -1,5 +1,6 @@
 import api from './api';
 
+// Add these methods to your existing authService object
 const authService = {
     // Register a new user
     register: async (userData) => {
@@ -80,6 +81,32 @@ const authService = {
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to update profile' };
+        }
+    },
+    getAllUsers: async () => {
+        try {
+            const response = await api.get('/users');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch users' };
+        }
+    },
+
+    updateUser: async (userId, userData) => {
+        try {
+            const response = await api.put(`/users/${userId}`, userData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to update user' };
+        }
+    },
+
+    deleteUser: async (userId) => {
+        try {
+            const response = await api.delete(`/users/${userId}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to delete user' };
         }
     }
 };

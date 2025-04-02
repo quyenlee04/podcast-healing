@@ -22,39 +22,13 @@ const podcastService = {
   },
 
   // Create a new podcast (with file upload)
-  createPodcast: async (podcastData) => {
+  createPodcast: async (formData) => {
     try {
-      // Create FormData for file uploads
-      const formData = new FormData();
-      
-      // Add text fields
-      formData.append('title', podcastData.title);
-      formData.append('description', podcastData.description);
-      formData.append('category', podcastData.category);
-      
-      if (podcastData.tags) {
-        formData.append('tags', podcastData.tags);
-      }
-      
-      if (podcastData.visibility) {
-        formData.append('visibility', podcastData.visibility);
-      }
-      
-      // Add files
-      if (podcastData.mp3File) {
-        formData.append('mp3', podcastData.mp3File);
-      }
-      
-      if (podcastData.coverImage) {
-        formData.append('coverImage', podcastData.coverImage);
-      }
-      
       const response = await api.post('/podcasts', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to create podcast' };
@@ -133,7 +107,19 @@ const podcastService = {
     } catch (error) {
       throw error.response?.data || { message: 'Failed to delete comment' };
     }
-  }
+  },
+
+  incrementListenCount: async (podcastId) => {
+    try {
+      const response = await api.post(`/podcasts/${podcastId}/increment-listen`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to increment listen count' };
+    }
+  },
 };
+
+
+
 
 export default podcastService;

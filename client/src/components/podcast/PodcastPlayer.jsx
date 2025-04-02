@@ -3,17 +3,46 @@ import ReactPlayer from "react-player";
 import { FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaStepForward, FaStepBackward, FaForward, FaBackward } from "react-icons/fa";
 import "../../styles/global.css";
 import "../../styles/podcast.css";
+import podcastService from "../../services/podcastService";
 
-const PodcastPlayer = ({ audioUrl, title, coverImage, onNext, onPrevious, hasNext = false, hasPrevious = false }) => {
+const PodcastPlayer = ({ 
+  audioUrl, 
+  title, 
+  coverImage, 
+  onNext, 
+  onPrevious, 
+  hasNext = false, 
+  hasPrevious = false, 
+  podcastId,
+  onListenCountUpdated // Add this prop
+}) => {
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [muted, setMuted] = useState(false);
   const [played, setPlayed] = useState(0);
   const [duration, setDuration] = useState(0);
   const playerRef = useRef(null);
+  const [viewCounted, setViewCounted] = useState(false);
+  const [listenDuration, setListenDuration] = useState(0);
+  const [listenCounted, setListenCounted] = useState(false);
 
-  const handlePlayPause = () => {
-    setPlaying(!playing);
+  const handlePlay = async () => {
+    if (!viewCounted && podcastId) {
+      try {
+        await podcastService.incrementListenCount(podcastId);
+        setViewCounted(true);
+      } catch (error) {
+        console.error('Failed to increment listen count:', error);
+      }
+    }
+    setPlaying(true);
+  };
+   const handlePlayPause = () => {
+    if (!playing) {
+      handlePlay();
+    } else {
+      setPlaying(false);
+    }
   };
 
   const handleVolumeChange = (e) => {
@@ -26,6 +55,27 @@ const PodcastPlayer = ({ audioUrl, title, coverImage, onNext, onPrevious, hasNex
 
   const handleProgress = (state) => {
     setPlayed(state.played);
+    // Track listening duration in seconds
+    const currentTime = state.playedSeconds;
+    setListenDuration(currentTime);
+
+    // If user has listened for more than 3 minutes and listen hasn't been counted
+    if (currentTime >= 180 && !listenCounted && podcastId) {
+      handleListenCount();
+      setListenCounted(true);
+    }
+  };
+
+  const handleListenCount = async () => {
+    try {
+      await podcastService.incrementListenCount(podcastId);
+      // Only call onListenCountUpdated if it exists
+      if (typeof onListenCountUpdated === 'function') {
+        onListenCountUpdated();
+      }
+    } catch (error) {
+      console.error('Failed to update listen count:', error);
+    }
   };
 
   const handleDuration = (duration) => {

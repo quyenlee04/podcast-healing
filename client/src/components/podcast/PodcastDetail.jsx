@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
 import podcastService from "../../services/podcastService";
+import { usePlayerContext } from "../../context/PlayerContext";
 import PodcastPlayer from "./PodcastPlayer";
 import "../../styles/global.css";
 import "../../styles/podcast.css"; 
@@ -11,8 +12,8 @@ const PodcastDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [relatedPodcasts, setRelatedPodcasts] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const navigate = useNavigate();
+  const { playPodcast, currentPodcast, isPlaying, togglePlay } = usePlayerContext();
+  const listenTracking = useRef();
 
   useEffect(() => {
     const fetchPodcast = async () => {
@@ -21,6 +22,12 @@ const PodcastDetail = () => {
         const data = await podcastService.getPodcastById(id);
         setPodcast(data);
         console.log("Podcast data:", data);
+        
+        // If this is the current podcast in the player, we don't need to do anything
+        // Otherwise, we'll fetch related podcasts but not auto-play
+        if (!currentPodcast || currentPodcast._id !== data._id) {
+          fetchRelatedPodcasts(data);
+        }
       } catch (err) {
         console.error("Error fetching podcast:", err);
         setError("Failed to load podcast. Please try again later.");
@@ -30,7 +37,7 @@ const PodcastDetail = () => {
     };
 
     fetchPodcast();
-  }, [id]);
+  }, [id, currentPodcast]);
 
   // Helper function to format URLs
   const getFullUrl = (path) => {
@@ -39,56 +46,67 @@ const PodcastDetail = () => {
     return `http://localhost:5000${path}`;
   };
   
-  // Add this to your useEffect or create a new one
-  useEffect(() => {
-    const fetchRelatedPodcasts = async () => {
-      if (podcast && podcast.category) {
-        try {
-          // Get podcasts in the same category
-          const data = await podcastService.getPodcasts({ 
-            category: podcast.category._id 
-          });
-          
-          const related = data.podcasts.filter(p => p._id !== podcast._id);
-          setRelatedPodcasts(related);
-          
-          // Find current index in case we navigated from a list
-          const index = related.findIndex(p => p._id === podcast._id);
-          if (index !== -1) {
-            setCurrentIndex(index);
+  const fetchRelatedPodcasts = async (podcastData) => {
+    if (podcastData && podcastData.category) {
+      try {
+        // Get podcasts in the same category
+        const data = await podcastService.getPodcasts({ 
+          category: podcastData.category._id 
+        });
+        
+        const related = data.podcasts.filter(p => p._id !== podcastData._id);
+        setRelatedPodcasts(related);
+      } catch (err) {
+        console.error("Error fetching related podcasts:", err);
+      }
+    }
+  };
+  
+  const handlePlayPodcast = async () => {
+    if (currentPodcast && currentPodcast._id === podcast._id) {
+      togglePlay();
+    } else {
+      playPodcast(podcast);
+      // Start tracking listen duration when played from button
+      if (!listenTracking.current) {
+        listenTracking.current = setTimeout(async () => {
+          try {
+            await podcastService.incrementListenCount(podcast._id);
+            handleListenCountUpdated();
+          } catch (error) {
+            console.error('Error updating listen count:', error);
           }
-        } catch (err) {
-          console.error("Error fetching related podcasts:", err);
-        }
+        }, 180000); // 3 minutes in milliseconds
+      }
+    }
+  };
+
+  // Add cleanup for listen tracking
+  useEffect(() => {
+    return () => {
+      if (listenTracking.current) {
+        clearTimeout(listenTracking.current);
       }
     };
-    
-    if (podcast) {
-      fetchRelatedPodcasts();
-    }
-  }, [podcast]);
-  
-  // Add these navigation functions
-  const handleNext = () => {
-    if (currentIndex < relatedPodcasts.length - 1) {
-      const nextPodcast = relatedPodcasts[currentIndex + 1];
-      navigate(`/podcasts/${nextPodcast._id}`);
-    }
-  };
-  
-  const handlePrevious = () => {
-    if (currentIndex > 0) {
-      const prevPodcast = relatedPodcasts[currentIndex - 1];
-      navigate(`/podcasts/${prevPodcast._id}`);
-    }
-  };
+  }, []);
 
   if (loading) return <div className="loading-container"><div className="loading-spinner"></div></div>;
   if (error) return <div className="error-container">{error}</div>;
   if (!podcast) return <div className="error-container">Podcast not found</div>;
 
+  const isCurrentlyPlaying = currentPodcast && currentPodcast._id === podcast._id && isPlaying;
+
+  const handleListenCountUpdated = async () => {
+    try {
+      const updatedPodcast = await podcastService.getPodcastById(id);
+      setPodcast(updatedPodcast);
+    } catch (error) {
+      console.error('Error refreshing podcast data:', error);
+    }
+  };
+
   return (
-    <div className="podcast-detail-container">
+    <div className="podcast-detail">
       <div className="podcast-header">
         <img 
           src={getFullUrl(podcast.coverImage)} 
@@ -107,25 +125,46 @@ const PodcastDetail = () => {
             {podcast.category && <span className="podcast-category">Category: {podcast.category.name}</span>}
             <span className="podcast-date">Published: {new Date(podcast.createdAt).toLocaleDateString()}</span>
           </div>
+          
+          <button 
+            onClick={handlePlayPodcast} 
+            className={`play-podcast-btn ${isCurrentlyPlaying ? 'playing' : ''}`}
+          >
+            {isCurrentlyPlaying ? 'Pause Episode' : 'Play Episode'}
+          </button>
         </div>
-      </div>
-      
-      <div className="podcast-player-container">
-        <PodcastPlayer 
-          audioUrl={getFullUrl(podcast.audioUrl)} 
-          title={podcast.title}
-          coverImage={getFullUrl(podcast.coverImage)}
-          onNext={handleNext}
-          onPrevious={handlePrevious}
-          hasNext={currentIndex < relatedPodcasts.length - 1}
-          hasPrevious={currentIndex > 0}
-        />
       </div>
       
       <div className="podcast-description">
         <h2>About this podcast</h2>
         <p>{podcast.description}</p>
       </div>
+      
+      {relatedPodcasts.length > 0 && (
+        <div className="related-podcasts">
+          <h2>More from this category</h2>
+          <div className="related-podcasts-grid">
+            {relatedPodcasts.slice(0, 4).map(relatedPodcast => (
+              <div key={relatedPodcast._id} className="related-podcast-card">
+                <img 
+                  src={getFullUrl(relatedPodcast.coverImage)} 
+                  alt={relatedPodcast.title}
+                  className="related-podcast-cover"
+                />
+                <div className="related-podcast-info">
+                  <h3>{relatedPodcast.title}</h3>
+                  <button 
+                    onClick={() => playPodcast(relatedPodcast, [podcast, ...relatedPodcasts])}
+                    className="play-related-btn"
+                  >
+                    Play
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       
       {podcast.comments && podcast.comments.length > 0 && (
         <div className="podcast-comments">
@@ -143,6 +182,14 @@ const PodcastDetail = () => {
           </ul>
         </div>
       )}
+      <PodcastPlayer 
+        audioUrl={getFullUrl(podcast.audioUrl)}
+        title={podcast.title}
+        coverImage={getFullUrl(podcast.coverImage)}
+        podcastId={podcast._id}
+        onListenCountUpdated={handleListenCountUpdated}
+        className="podcast-player"
+      />
     </div>
   );
 };

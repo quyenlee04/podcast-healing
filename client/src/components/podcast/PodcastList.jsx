@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { FaPlay, FaPause } from "react-icons/fa";
 import "../../styles/global.css";
+import "../../styles/podcast.css";
 import podcastService from "../../services/podcastService";
+import { usePlayerContext } from "../../context/PlayerContext";
 
 const PodcastList = () => {
   const [podcasts, setPodcasts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { playPodcast, currentPodcast, isPlaying, togglePlay } = usePlayerContext();
 
   useEffect(() => {
     const fetchPodcasts = async () => {
       try {
         setLoading(true);
-        // Use podcastService instead of direct axios call
         const data = await podcastService.getPodcasts();
         setPodcasts(data.podcasts || []);
-        console.log("Podcasts data:", data.podcasts); // Debug log
+        console.log("Podcasts data:", data.podcasts);
       } catch (err) {
         console.error("Error fetching podcasts:", err);
         setError("Failed to load podcasts. Please try again later.");
@@ -42,42 +45,73 @@ const PodcastList = () => {
     return `http://localhost:5000${imagePath}`;
   };
 
+  const handlePlayPodcast = (podcast, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (currentPodcast && currentPodcast._id === podcast._id) {
+      // If this is already the current podcast, just toggle play/pause
+      togglePlay();
+    } else {
+      // Otherwise, start playing this podcast with the rest of the list as queue
+      playPodcast(podcast, podcasts);
+    }
+  };
+
   if (loading) return <div className="loading-container"><div className="loading-spinner"></div></div>;
   if (error) return <div className="error-container">{error}</div>;
 
   return (
     <div className="podcast-list-container">
-      <h1 className="page-title">Discover Podcasts</h1>
+      <h1 className="page-title">Explore Podcasts</h1>
 
-      {podcasts.length > 0 ? (
-        <div className="podcast-grid">
-          {podcasts.map((podcast) => (
-            <Link to={`/podcasts/${podcast._id}`} key={podcast._id} className="podcast-card">
-              <div className="podcast-card-image">
-                <img
-                  src={getImageUrl(podcast.coverImage)}
-                  alt={podcast.title}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/images/default-cover.jpg";
-                  }}
-                />
-              </div>
-              <div className="podcast-card-content">
-                <h3 className="podcast-card-title">{podcast.title}</h3>
-                <p className="podcast-card-description">{podcast.description.substring(0, 100)}...</p>
-                <div className="podcast-card-meta">
-                  {podcast.category && <span className="podcast-card-category">{podcast.category.name}</span>}
-                  <span className="podcast-card-date">{new Date(podcast.createdAt).toLocaleDateString()}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
+      {podcasts.length === 0 ? (
+        <div className="no-podcasts">
+          <p>No podcasts found. Check back later for new content!</p>
         </div>
       ) : (
-        <div className="no-podcasts">
-          <p>No podcasts available.</p>
-          <Link to="/upload" className="btn-primary">Upload a Podcast</Link>
+        <div className="podcast-grid">
+          {podcasts.map((podcast) => {
+            const isCurrentlyPlaying = 
+              currentPodcast && 
+              currentPodcast._id === podcast._id && 
+              isPlaying;
+              
+            return (
+              <Link
+                to={`/podcasts/${podcast._id}`}
+                key={podcast._id}
+                className="podcast-card"
+              >
+                <div className="podcast-card-image-container">
+                  <img
+                    src={getImageUrl(podcast.coverImage)}
+                    alt={podcast.title}
+                    className="podcast-card-image"
+                  />
+                  <button 
+                    className={`podcast-play-button ${isCurrentlyPlaying ? 'playing' : ''}`}
+                    onClick={(e) => handlePlayPodcast(podcast, e)}
+                  >
+                    {isCurrentlyPlaying ? <FaPause /> : <FaPlay />}
+                  </button>
+                  <div className="podcast-listen-count">
+                    <i className="bi bi-headphones"></i>
+                    {podcast.listenCount || 0}
+                  </div>
+                </div>
+                <div className="podcast-info">
+                  <h3 className="podcast-title">{podcast.title}</h3>
+                  <p className="podcast-author">
+                    {podcast.author ? podcast.author.username : "Unknown Author"}
+                  </p>
+                </div>
+                {podcast.category && (
+                    <span className="podcast-card-category">{podcast.category.name}</span>
+                  )}
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>
