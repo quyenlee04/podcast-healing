@@ -68,7 +68,28 @@ const podcastService = {
       throw error.response?.data || { message: 'Failed to update podcast' };
     }
   },
+// ... existing code ...
 
+// getPodcastsByAuthor: async () => {
+//   try {
+//     const response = await api.get('/podcasts/author');
+//     return response.data;
+//   } catch (error) {
+//     throw error.response?.data || { message: 'Failed to fetch user podcasts' };
+//   }
+// },
+
+// ... rest of your code ...
+getPodcastsByAuthor: async (authorId) => {
+  try {
+    const response = await api.get(`/podcasts/author/${authorId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to fetch user podcasts' };
+  }
+},
+
+// ... rest of the code ...
   // Delete a podcast
   deletePodcast: async (id) => {
     try {
@@ -88,7 +109,14 @@ const podcastService = {
       throw error.response?.data || { message: 'Failed to toggle like' };
     }
   },
-
+  getLikedPodcasts: async () => {
+    try {
+      const response = await api.get('/podcasts/liked');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch liked podcasts' };
+    }
+  },
   // Add a comment to a podcast
   addComment: async (id, text) => {
     try {
@@ -115,6 +143,14 @@ const podcastService = {
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to increment listen count' };
+    }
+  },
+  getLikedPodcasts: async () => {
+    try {
+      const response = await api.get('/podcasts/liked');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch liked podcasts' };
     }
   },
 };

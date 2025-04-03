@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Profile from "../components/user/Profile";
-import Favorites from "../components/user/Favorites";
+import MyPodcasts from "../components/user/Favorites";
+import UserPodcasts from "../components/user/UserPodcasts"; // Add this import
 import "../styles/ProfilePage.css";
 
 const ProfilePage = () => {
@@ -10,13 +11,18 @@ const ProfilePage = () => {
     <div className="profile-page">
       <h1>My Account</h1>
       
-      {/* Tab Navigation */}
       <div className="tabs">
         <button 
           className={activeTab === "profile" ? "active" : ""}
           onClick={() => setActiveTab("profile")}
         >
           Profile
+        </button>
+        <button 
+          className={activeTab === "uploads" ? "active" : ""}
+          onClick={() => setActiveTab("uploads")}
+        >
+          My Uploads
         </button>
         <button 
           className={activeTab === "favorites" ? "active" : ""}
@@ -26,10 +32,10 @@ const ProfilePage = () => {
         </button>
       </div>
 
-      {/* Nội dung thay đổi theo tab */}
       <div className="tab-content">
         {activeTab === "profile" && <Profile />}
-        {activeTab === "favorites" && <Favorites />}
+        {activeTab === "uploads" && <UserPodcasts />}
+        {activeTab === "favorites" && <MyPodcasts />}
       </div>
     </div>
   );

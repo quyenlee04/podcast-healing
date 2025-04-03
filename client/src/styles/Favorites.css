@@ -1,77 +1,98 @@
 .favorites-container {
-    max-width: 800px;
-    margin: 30px auto;
-    background: var(--secondary-color);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
 }
 
-.favorites-container h2 {
-    text-align: center;
-    color: var(--primary-color);
-    margin-bottom: 20px;
-}
-
-.favorite-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
 }
 
 .favorite-item {
-    display: flex;
-    align-items: center;
-    background: #222;
-    padding: 10px;
-    border-radius: 8px;
-    transition: 0.3s;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease;
+  text-align: center;
 }
 
 .favorite-item:hover {
-    background: #333;
+  transform: translateY(-5px);
 }
 
 .favorite-item img {
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
-    margin-right: 15px;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 
 .favorite-item h3 {
-    font-size: 1.1rem;
-    color: var(--text-color);
-    margin: 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.remove-favorite-btn {
-    background: red;
-    color: var(--text-color);
-    border: none;
-    padding: 8px 12px;
-    margin-left: auto;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.3s;
+.no-favorites {
+  text-align: center;
+  padding: 40px;
 }
 
-.remove-favorite-btn:hover {
-    background: darkred;
+.browse-link {
+  display: inline-block;
+  margin-top: 15px;
+  color: var(--primary-color);
+  text-decoration: none;
 }
 
-/* Responsive cho mobile */
-@media (max-width: 768px) {
-    .favorites-container {
-        width: 95%;
-    }
+.browse-link:hover {
+  text-decoration: underline;
+}
 
-    .favorite-item {
-        flex-direction: column;
-        text-align: center;
-    }
+.favorite-item-container {
+  position: relative;
+  transition: transform 0.2s ease;
+}
 
-    .favorite-item img {
-        margin-bottom: 10px;
-    }
+.podcast-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.favorite-item-container:hover .podcast-actions {
+  opacity: 1;
+}
+
+.edit-btn,
+.delete-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.edit-btn:hover {
+  color: #4a9eff;
+}
+
+.delete-btn:hover {
+  color: #ff4a4a;
 }

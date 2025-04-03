@@ -1,19 +1,26 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams , useNavigate} from "react-router-dom";
 import podcastService from "../../services/podcastService";
 import { usePlayerContext } from "../../context/PlayerContext";
 import PodcastPlayer from "./PodcastPlayer";
 import "../../styles/global.css";
 import "../../styles/podcast.css"; 
+import LikeButton from '../common/LikeButton';
+import { useContext } from 'react';
+import { AuthContext } from "../../context/AuthContext";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
-const PodcastDetail = () => {
+const PodcastDetail = ({ isSidebarOpen }) => {
   const { id } = useParams();
   const [podcast, setPodcast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLiked, setIsLiked] = useState(false); // Add this line
   const [relatedPodcasts, setRelatedPodcasts] = useState([]);
   const { playPodcast, currentPodcast, isPlaying, togglePlay } = usePlayerContext();
   const listenTracking = useRef();
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPodcast = async () => {
@@ -21,10 +28,11 @@ const PodcastDetail = () => {
         setLoading(true);
         const data = await podcastService.getPodcastById(id);
         setPodcast(data);
-        console.log("Podcast data:", data);
+        // Check if the current user has liked this podcast
+        if (user && data.likes) {
+          setIsLiked(data.likes.includes(user._id));
+        }
         
-        // If this is the current podcast in the player, we don't need to do anything
-        // Otherwise, we'll fetch related podcasts but not auto-play
         if (!currentPodcast || currentPodcast._id !== data._id) {
           fetchRelatedPodcasts(data);
         }
@@ -37,7 +45,29 @@ const PodcastDetail = () => {
     };
 
     fetchPodcast();
-  }, [id, currentPodcast]);
+  }, [id, user]); // Add user to dependency array
+
+  const handleLike = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await podcastService.toggleLike(podcast._id);
+      setIsLiked(response.liked);
+      
+      // Update podcast likes count
+      setPodcast(prev => ({
+        ...prev,
+        likes: response.liked 
+          ? [...(prev.likes || []), user._id]
+          : (prev.likes || []).filter(id => id !== user._id)
+      }));
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  };
 
   // Helper function to format URLs
   const getFullUrl = (path) => {
@@ -63,22 +93,19 @@ const PodcastDetail = () => {
   };
   
   const handlePlayPodcast = async () => {
-    if (currentPodcast && currentPodcast._id === podcast._id) {
-      togglePlay();
-    } else {
-      playPodcast(podcast);
-      // Start tracking listen duration when played from button
-      if (!listenTracking.current) {
-        listenTracking.current = setTimeout(async () => {
-          try {
-            await podcastService.incrementListenCount(podcast._id);
-            handleListenCountUpdated();
-          } catch (error) {
-            console.error('Error updating listen count:', error);
-          }
-        }, 180000); // 3 minutes in milliseconds
+    try {
+      // Increment listen count when playing
+      await podcastService.incrementListenCount(podcast._id);
+      
+      if (currentPodcast && currentPodcast._id === podcast._id) {
+        togglePlay();
+      } else {
+        playPodcast(podcast);
       }
+    } catch (error) {
+      console.error('Failed to update listen count:', error);
     }
+  
   };
 
   // Add cleanup for listen tracking
@@ -96,17 +123,10 @@ const PodcastDetail = () => {
 
   const isCurrentlyPlaying = currentPodcast && currentPodcast._id === podcast._id && isPlaying;
 
-  const handleListenCountUpdated = async () => {
-    try {
-      const updatedPodcast = await podcastService.getPodcastById(id);
-      setPodcast(updatedPodcast);
-    } catch (error) {
-      console.error('Error refreshing podcast data:', error);
-    }
-  };
+
 
   return (
-    <div className="podcast-detail">
+    <div className={`podcast-detail ${isSidebarOpen ? '' : 'sidebar-closed'}`}>
       <div className="podcast-header">
         <img 
           src={getFullUrl(podcast.coverImage)} 
@@ -126,14 +146,23 @@ const PodcastDetail = () => {
             <span className="podcast-date">Published: {new Date(podcast.createdAt).toLocaleDateString()}</span>
           </div>
           
-          <button 
-            onClick={handlePlayPodcast} 
-            className={`play-podcast-btn ${isCurrentlyPlaying ? 'playing' : ''}`}
-          >
-            {isCurrentlyPlaying ? 'Pause Episode' : 'Play Episode'}
-          </button>
+          <div className="podcast-actions">
+            <button 
+              onClick={handlePlayPodcast} 
+              className={`play-podcast-btn ${isCurrentlyPlaying ? 'playing' : ''}`}
+            >
+              {isCurrentlyPlaying ? 'Pause Episode' : 'Play Episode'}
+            </button>
+            <button 
+              className={`like-button ${isLiked ? 'liked' : ''}`}
+              onClick={handleLike}
+            >
+              {isLiked ? <FaHeart /> : <FaRegHeart />}
+            </button>
+          </div>
         </div>
       </div>
+      
       
       <div className="podcast-description">
         <h2>About this podcast</h2>
@@ -182,14 +211,14 @@ const PodcastDetail = () => {
           </ul>
         </div>
       )}
-      <PodcastPlayer 
+      {/* <PodcastPlayer 
         audioUrl={getFullUrl(podcast.audioUrl)}
         title={podcast.title}
         coverImage={getFullUrl(podcast.coverImage)}
         podcastId={podcast._id}
         onListenCountUpdated={handleListenCountUpdated}
         className="podcast-player"
-      />
+      /> */}
     </div>
   );
 };

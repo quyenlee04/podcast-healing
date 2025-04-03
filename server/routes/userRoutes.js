@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs'); 
-const { register, login, getUserById, getAllUsers, updateProfile, deleteUser } = require('../controllers/userController');
+const { register, login, getUserById, getAllUsers,updateUser,updateUsers, updateProfile, deleteUser } = require('../controllers/userController');
 const { validateRegistration, validateLogin } = require('../middleware/validationMiddleware');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
 
@@ -45,7 +45,10 @@ router.post('/register', validateRegistration, register);
 router.post('/login', validateLogin, login);
 router.get('/:id', protect, getUserById);
 router.put('/profile', protect, upload.single('avatar'), updateProfile);
+router.put('/:id', protect, adminOnly, updateUser);
 router.delete('/:id', protect, adminOnly, deleteUser);
 router.get('/', protect, adminOnly, getAllUsers);
+router.get('/favorites/:userId', protect, getUserById);
+
 
 module.exports = router;

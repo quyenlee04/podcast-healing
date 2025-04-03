@@ -1,4 +1,3 @@
-// ... existing imports ...
 
 const Navigation = () => {
   const isLoggedIn = !!localStorage.getItem('token');

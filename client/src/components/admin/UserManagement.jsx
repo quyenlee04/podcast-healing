@@ -57,7 +57,7 @@ const UserManagement = () => {
       username: user.username,
       email: user.email,
       role: user.role,
-      password: '' // Clear password for editing
+      password: '' 
     });
     setShowModal(true);
   };
@@ -101,7 +101,7 @@ const UserManagement = () => {
 
       {/* User Table */}
       <div className="table-responsive">
-        <table className="table table-dark table-hover">
+        <table className="table table-striped table-hover">
           <thead>
             <tr>
               <th>Username</th>
@@ -145,10 +145,10 @@ const UserManagement = () => {
       {/* Add/Edit Modal */}
       <div className={`modal ${showModal ? 'show' : ''}`} style={{ display: showModal ? 'block' : 'none' }}>
         <div className="modal-dialog">
-          <div className="modal-content bg-dark text-light">
+          <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">{editingUser ? 'Edit User' : 'Add User'}</h5>
-              <button type="button" className="btn-close btn-close-white" onClick={handleCloseModal}></button>
+              <button type="button" className="btn-close" onClick={handleCloseModal}></button>
             </div>
             <div className="modal-body">
               <form onSubmit={handleSubmit}>

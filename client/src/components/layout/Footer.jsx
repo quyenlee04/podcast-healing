@@ -1,10 +1,20 @@
 import React from "react";
-import "../../styles/global.css";
+import "../../styles/Footer.css";
 
 const Footer = () => {
   return (
     <footer className="footer">
-      <p>&copy; 2025 Podcast Healing. All rights reserved.</p>
+      <div className="footer-content">
+        <div className="footer-left">
+          <select className="language-select">
+            <option value="vi">Việt Nam</option>
+            <option value="en">English (UK)</option>
+          </select>
+        </div>
+        <div className="footer-right">
+          <span>Bản quyền © 2025 Podcast Healing Inc.</span>
+        </div>
+      </div>
     </footer>
   );
 };

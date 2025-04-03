@@ -210,6 +210,28 @@ exports.getPodcast = async (req, res) => {
     });
   }
 };
+// Add this to your getPodcast controller function
+// ... existing code ...
+
+exports.getPodcastsByAuthor = async (req, res) => {
+  try {
+    const authorId = req.params.id;
+    
+    if (!authorId) {
+      return res.status(400).json({ error: 'Author ID is required' });
+    }
+
+    const podcasts = await Podcast.find({ author: authorId })
+      .sort('-createdAt')
+      .populate('author', 'username')
+      .populate('category', 'name');
+
+    res.json({ podcasts });
+  } catch (error) {
+    console.error('Error in getPodcastsByAuthor:', error);
+    res.status(500).json({ error: 'Failed to fetch podcasts' });
+  }
+};
 
 exports.getSinglePodcast = async (req, res) => {
   try {
@@ -343,31 +365,69 @@ exports.updatePodcast = async (req, res) => {
   }
 };
 
+// Add this function with other controller functions
 exports.toggleLike = async (req, res) => {
   try {
-    const podcast = await Podcast.findById(req.params.id);
+    const podcastId = req.params.id;
+    const userId = req.user._id;
+
+    // Find the podcast
+    const podcast = await Podcast.findById(podcastId);
     if (!podcast) {
       return res.status(404).json({ message: 'Podcast not found' });
     }
 
-    // Check if user already liked the podcast
-    const index = podcast.likes.findIndex(id => id.toString() === req.user._id.toString());
+    // Check if user has already liked the podcast
+    const likeIndex = podcast.likes.indexOf(userId);
     
-    if (index === -1) {
-      // User hasn't liked the podcast yet, add like
-      podcast.likes.push(req.user._id);
+    if (likeIndex === -1) {
+      // Add like
+      podcast.likes.push(userId);
     } else {
-      // User already liked the podcast, remove like
-      podcast.likes.splice(index, 1);
+      // Remove like
+      podcast.likes.splice(likeIndex, 1);
     }
 
+    // Save the updated podcast
     await podcast.save();
-    res.json({ 
-      message: index === -1 ? 'Podcast liked' : 'Like removed',
-      likes: podcast.likes.length
+
+    res.json({
+      success: true,
+      liked: likeIndex === -1,
+      likesCount: podcast.likes.length,
+      message: likeIndex === -1 ? 'Podcast liked successfully' : 'Podcast unliked successfully'
     });
+
   } catch (error) {
-    res.status(500).json({ message: 'Error toggling like', error: error.message });
+    console.error('Error in toggleLike:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error processing like/unlike action',
+      error: error.message 
+    });
+  }
+};
+
+exports.getLikedPodcasts = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const likedPodcasts = await Podcast.find({
+      likes: userId
+    }).populate('author category');
+
+    res.json({
+      success: true,
+      podcasts: likedPodcasts
+    });
+
+  } catch (error) {
+    console.error('Error in getLikedPodcasts:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error fetching liked podcasts',
+      error: error.message 
+    });
   }
 };
 
@@ -405,6 +465,7 @@ exports.addComment = async (req, res) => {
     res.status(500).json({ message: 'Error adding comment', error: error.message });
   }
 };
+
 
 exports.deleteComment = async (req, res) => {
   try {

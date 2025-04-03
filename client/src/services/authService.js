@@ -19,6 +19,7 @@ const authService = {
 
             // Store token and user data in localStorage
             if (response.data.token) {
+                // No need to manipulate the token as it's already in correct format from server
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
             }
@@ -29,19 +30,19 @@ const authService = {
         }
     },
 
-    // Logout a user
+    
     logout: () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
     },
 
-    // Get current user from localStorage
+   
     getCurrentUser: () => {
         const user = localStorage.getItem('user');
         return user ? JSON.parse(user) : null;
     },
 
-    // Get user by ID
+    
     getUserById: async (id) => {
         try {
             const response = await api.get(`/users/${id}`);
@@ -51,10 +52,10 @@ const authService = {
         }
     },
 
-    // Update user profile
+   
     updateProfile: async (profileData) => {
         try {
-            // Create FormData for file uploads
+            
             const formData = new FormData();
 
             // Add text fields

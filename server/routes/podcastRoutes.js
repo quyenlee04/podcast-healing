@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const {createPodcast, getPodcast, getSinglePodcast, incrementListenCount,updatePodcast, deletePodcast, toggleLike, addComment, deleteComment , getPopularPodcasts} = require('../controllers/podcastController');
+const {createPodcast, getPodcast, getLikedPodcasts,getPodcastsByAuthor, getSinglePodcast, incrementListenCount,updatePodcast, deletePodcast, toggleLike, addComment, deleteComment , getPopularPodcasts} = require('../controllers/podcastController');
 const { protect } = require('../middleware/authMiddleware');
 
 // Set up multer storage for uploads
@@ -75,6 +75,8 @@ const uploadFields = upload.fields([
 router.post('/', protect, uploadFields, createPodcast);
 router.get('/', getPodcast);
 router.get('/popular', getPopularPodcasts);
+router.get('/liked', protect, getLikedPodcasts);
+router.get('/author/:id', protect, getPodcastsByAuthor);
 router.get('/:id', getSinglePodcast);
 router.put('/:id', protect, uploadFields, updatePodcast);
 router.delete('/:id', protect, deletePodcast);
@@ -84,5 +86,21 @@ router.delete('/:id/comment/:commentId', protect, deleteComment);
 router.post('/:id/increment-listen', incrementListenCount);
 // Add this new route before module.exports
 
+// ... existing imports ...
 
+// Update the route for getting author's podcasts
+// router.get('/author', protect, async (req, res) => {
+//   try {
+//     const podcasts = await Podcast.find({ author: req.user._id })
+//       .sort('-createdAt')
+//       .populate('author', 'username')
+//       .populate('category', 'name');
+    
+//     res.json({ podcasts });
+//   } catch (error) {
+//     res.status(500).json({ error: 'Failed to fetch podcasts' });
+//   }
+// });
+
+// ... rest of your routes ...
 module.exports = router;

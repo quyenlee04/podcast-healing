@@ -10,11 +10,7 @@ const Header = ({ toggleSidebar }) => {
     return (
         <header className="header">
             
-            <div className="sidebar-toggle">
-                <button onClick={toggleSidebar} className="toggle-button">
-                    <FaBars />
-                </button>
-            </div>
+          
             
             {/* Logo và Search Bar ở giữa */}
             <div className="header-center">

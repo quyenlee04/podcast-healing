@@ -9,11 +9,12 @@ const api = axios.create({
   }
 });
 
-// Add a request interceptor to include auth token
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token && !config.headers.Authorization) {
+      // Token is already in 'Bearer token' format from localStorage
       config.headers.Authorization = token;
     }
     return config;
@@ -21,16 +22,14 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add a response interceptor to handle errors
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Handle unauthorized errors (401)
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Redirect to login page if needed
-      // window.location.href = '/login';
+    
     }
     return Promise.reject(error);
   }

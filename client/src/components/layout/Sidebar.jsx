@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaHome, FaFire, FaHeart, FaUser, FaCloudUploadAlt, FaSignInAlt, FaPodcast, FaBars } from "react-icons/fa";
 import "../../styles/Sidebar.css";
+import { FaListUl } from "react-icons/fa";
 
 const Sidebar = ({ isOpen, onToggle }) => {
   return (
@@ -37,6 +38,12 @@ const Sidebar = ({ isOpen, onToggle }) => {
           <Link to="/profile">
             <FaUser className="icon" />
             <span className="text">Profile</span>
+          </Link>
+        </li>
+        <li>
+          <Link to="/categories">
+            <FaListUl className="icon" />
+            <span className="text">Categories</span>
           </Link>
         </li>
         <li>

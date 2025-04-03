@@ -3,7 +3,7 @@ import UserManagement from "./UserManagement";
 import PodcastManagement from "./PodcastManagement";
 import CategoryManagement from "./CategoryManagement";
 import "../../styles/Admin.css";
-
+import { Link } from "react-router-dom";
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
 
@@ -17,6 +17,10 @@ const Dashboard = () => {
             Admin Panel
           </h3>
           <div className="nav flex-column">
+            <Link to="/" className="nav-link d-flex align-items-center mb-3">
+              <i className="bi bi-arrow-left-circle me-3"></i>
+              Back to App
+            </Link>
             <button 
               className={`nav-link d-flex align-items-center ${activeTab === 'users' ? 'active' : ''}`}
               onClick={() => setActiveTab('users')}

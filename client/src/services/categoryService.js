@@ -24,22 +24,30 @@ const categoryService = {
   // Create a new category (admin only)
   createCategory: async (categoryData) => {
     try {
-      const response = await api.post('/categories', categoryData);
+      const response = await api.post('/categories', categoryData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to create category' };
     }
   },
 
-  // Update a category (admin only)
   updateCategory: async (id, categoryData) => {
     try {
-      const response = await api.put(`/categories/${id}`, categoryData);
+      const response = await api.put(`/categories/${id}`, categoryData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update category' };
     }
   },
+
 
   // Delete a category (admin only)
   deleteCategory: async (id) => {

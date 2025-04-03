@@ -45,21 +45,25 @@ const PodcastList = () => {
     return `http://localhost:5000${imagePath}`;
   };
 
-  const handlePlayPodcast = (podcast, e) => {
+  const handlePlayPodcast = async (podcast, e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (currentPodcast && currentPodcast._id === podcast._id) {
-      // If this is already the current podcast, just toggle play/pause
-      togglePlay();
-    } else {
-      // Otherwise, start playing this podcast with the rest of the list as queue
-      playPodcast(podcast, podcasts);
+    try {
+      await podcastService.incrementListenCount(podcast._id);
+      if (currentPodcast && currentPodcast._id === podcast._id) {
+        togglePlay();
+      }
+      else {
+        playPodcast(podcast, podcasts);
+      }
+    } catch (error) {
+      console.error('Failed to update listen count:', error);
     }
-  };
+  }; // Removed extra curly brace here
 
   if (loading) return <div className="loading-container"><div className="loading-spinner"></div></div>;
   if (error) return <div className="error-container">{error}</div>;
+
 
   return (
     <div className="podcast-list-container">
@@ -72,11 +76,11 @@ const PodcastList = () => {
       ) : (
         <div className="podcast-grid">
           {podcasts.map((podcast) => {
-            const isCurrentlyPlaying = 
-              currentPodcast && 
-              currentPodcast._id === podcast._id && 
+            const isCurrentlyPlaying =
+              currentPodcast &&
+              currentPodcast._id === podcast._id &&
               isPlaying;
-              
+
             return (
               <Link
                 to={`/podcasts/${podcast._id}`}
@@ -89,7 +93,7 @@ const PodcastList = () => {
                     alt={podcast.title}
                     className="podcast-card-image"
                   />
-                  <button 
+                  <button
                     className={`podcast-play-button ${isCurrentlyPlaying ? 'playing' : ''}`}
                     onClick={(e) => handlePlayPodcast(podcast, e)}
                   >
@@ -107,8 +111,8 @@ const PodcastList = () => {
                   </p>
                 </div>
                 {podcast.category && (
-                    <span className="podcast-card-category">{podcast.category.name}</span>
-                  )}
+                  <span className="podcast-card-category">{podcast.category.name}</span>
+                )}
               </Link>
             );
           })}

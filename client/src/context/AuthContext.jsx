@@ -13,8 +13,8 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,19 +61,34 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     toast.success('Logged out successfully');
   };
+  const updateUser = async () => {
+    try {
+      const currentUser = authService.getCurrentUser();
+      if (currentUser && currentUser._id) { // Check for _id instead of id
+        const response = await authService.getUserById(currentUser._id);
+        if (response && response.user) {
+          setUser(response.user);
+          localStorage.setItem('user', JSON.stringify(response.user));
+        }
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+      toast.error('Failed to update user information');
+    }
+  };
+
   const value = {
-    isAuthenticated,
     user,
-    loading,
-    logout,
-    setIsAuthenticated,
     setUser,
-    showLoginPrompt
+    isAuthenticated,
+    setIsAuthenticated,
+    logout,
+    updateUser  // Add this to the context value
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

@@ -42,15 +42,25 @@ const CategoryManagement = () => {
     }
   };
 
+  const handleEdit = (category) => {
+    setEditingCategory(category);
+    setFormData({
+      name: category.name,
+      description: category.description || '',
+      image: null // Reset image when editing
+    });
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const formDataToSend = new FormData();
-      Object.keys(formData).forEach(key => {
-        if (formData[key]) {
-          formDataToSend.append(key, formData[key]);
-        }
-      });
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('description', formData.description);
+      if (formData.image) {
+        formDataToSend.append('image', formData.image);
+      }
 
       if (editingCategory) {
         await categoryService.updateCategory(editingCategory._id, formDataToSend);
@@ -65,15 +75,6 @@ const CategoryManagement = () => {
     }
   };
 
-  const handleEdit = (category) => {
-    setEditingCategory(category);
-    setFormData({
-      name: category.name,
-      description: category.description || ''
-    });
-    setShowModal(true);
-  };
-
   const handleDelete = async (categoryId) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
@@ -84,6 +85,11 @@ const CategoryManagement = () => {
         alert(err.message);
       }
     }
+  };
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return '/default-category.jpg';
+    if (imagePath.startsWith('http')) return imagePath;
+    return `http://localhost:5000${imagePath}`;
   };
 
   const handleCloseModal = () => {
@@ -111,9 +117,8 @@ const CategoryManagement = () => {
         </button>
       </div>
 
-      {/* Category Table */}
       <div className="table-responsive">
-        <table className="table table-dark table-hover">
+        <table className="table table-striped table-hover">
           <thead>
             <tr>
               <th>Name</th>
@@ -128,14 +133,14 @@ const CategoryManagement = () => {
                 <td>{category.name}</td>
                 <td>{category.description}</td>
                 <td>
-                  {category.image && (
-                    <img 
-                      src={category.image} 
-                      alt={category.name} 
-                      style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                      className="rounded"
-                    />
-                  )}
+                  <img 
+                    src={getImageUrl(category.image)} 
+                    alt={category.name}
+                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.target.src = '/default-category.jpg';
+                    }}
+                  />
                 </td>
                 <td>
                   <div className="btn-group">
@@ -159,64 +164,67 @@ const CategoryManagement = () => {
         </table>
       </div>
 
-      {/* Add/Edit Modal */}
-      <div className={`modal ${showModal ? 'show' : ''}`} style={{ display: showModal ? 'block' : 'none' }}>
-        <div className="modal-dialog">
-          <div className="modal-content bg-dark text-light">
-            <div className="modal-header">
-              <h5 className="modal-title">{editingCategory ? 'Edit Category' : 'Add Category'}</h5>
-              <button type="button" className="btn-close btn-close-white" onClick={handleCloseModal}></button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label className="form-label">Name</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Description</label>
-                  <textarea
-                    className="form-control"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    rows="3"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Image</label>
-                  <input
-                    type="file"
-                    className="form-control"
-                    name="image"
-                    accept="image/*"
-                    onChange={handleInputChange}
-                    required={!editingCategory}
-                  />
-                </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    {editingCategory ? 'Update' : 'Add'}
-                  </button>
-                </div>
-              </form>
+      {/* Modal Form */}
+      {showModal && (
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog">
+            <div className="modal-content bg-dark text-light">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  {editingCategory ? 'Edit Category' : 'Add New Category'}
+                </h5>
+                <button type="button" className="btn-close btn-close-white" onClick={handleCloseModal}></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleSubmit} encType="multipart/form-data">
+                  <div className="mb-3">
+                    <label className="form-label">Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      className="form-control"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Description</label>
+                    <textarea
+                      name="description"
+                      className="form-control"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Image</label>
+                    <input
+                      type="file"
+                      name="image"
+                      className="form-control"
+                      onChange={handleInputChange}
+                      accept="image/*"
+                    />
+                  </div>
+                  <div className="modal-footer">
+                    <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      {editingCategory ? 'Update' : 'Create'}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      {showModal && <div className="modal-backdrop fade show"></div>}
+      )}
     </div>
-  );
+);
+     
+
 };
 
 export default CategoryManagement;

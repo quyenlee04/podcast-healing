@@ -62,7 +62,7 @@ const PodcastManagement = () => {
     e.preventDefault();
     try {
       const formDataToSend = new FormData();
-      
+
       // Add text fields with correct field names
       formData.title && formDataToSend.append('title', formData.title);
       formData.description && formDataToSend.append('description', formData.description);
@@ -138,8 +138,8 @@ const PodcastManagement = () => {
       </div>
 
       {/* Podcast Table */}
-      <div className="table-responsive">
-        <table className="table table-dark table-hover">
+      <div className="">
+        <table className="table table-striped table-hover">
           <thead>
             <tr>
               <th>Title</th>
@@ -166,13 +166,13 @@ const PodcastManagement = () => {
                 </td>
                 <td>
                   <div className="btn-group">
-                    <button 
+                    <button
                       className="btn btn-sm btn-outline-info"
                       onClick={() => handleEdit(podcast)}
                     >
                       <i className="bi bi-pencil"></i>
                     </button>
-                    <button 
+                    <button
                       className="btn btn-sm btn-outline-danger"
                       onClick={() => handleDelete(podcast._id)}
                     >

@@ -9,7 +9,6 @@ exports.register = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
 
-    // Check if user already exists
     let existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
@@ -179,7 +178,7 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Update profile with avatar upload
+
 exports.updateProfile = async (req, res) => {
   try {
     const { firstName, lastName, bio } = req.body;
@@ -252,4 +251,48 @@ exports.updateProfile = async (req, res) => {
       error: error.message 
     });
   }
+};
+
+exports.updateUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.role = role;
+    await user.save();
+  } 
+  catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.updateUsers = async (req, res) => {
+  try {
+    const { username, email, role } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (role) user.role = role;
+
+      await user.save();
+      res.json({
+        message: 'User updated successfully',
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role
+        }
+      });
+    }
+  catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  } 
 };

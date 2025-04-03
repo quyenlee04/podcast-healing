@@ -13,6 +13,7 @@ import Dashboard from "./components/admin/Dashboard";
 
 // Client Components
 import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
 import Sidebar from "./components/layout/Sidebar";
 import GlobalPlayer from "./components/player/GlobalPlayer";
 import Login from "./components/auth/Login";
@@ -23,8 +24,9 @@ import ExplorePage from "./pages/ExplorePage";
 import ProfilePage from "./pages/ProfilePage";
 import PodcastDetail from "./components/podcast/PodcastDetail";
 import PodcastList from "./components/podcast/PodcastList";
-
-// Layouts
+import CategoriesPage from "./pages/CategoriesPage";
+import Favorites from "./components/user/Favorites";
+// Layoutse
 const AdminLayout = ({ children }) => {
   return <div className="admin-layout">{children}</div>;
 };
@@ -38,11 +40,12 @@ const ClientLayout = ({ children }) => {
 
   return (
     <div className="app-container">
-      <Header toggleSidebar={toggleSidebar} />
+      <Header />
       <Sidebar isOpen={isSidebarOpen} />
       <main className={`main-content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
         {children}
       </main>
+      <Footer />
       <GlobalPlayer />
     </div>
   );
@@ -80,13 +83,6 @@ const App = () => {
                 </AdminRoute>
               }
             />
-
-            {/* Auth Routes (No Layout) */}
-            {/* <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/reset-password" element={<ResetPassword />} /> */}
-
-            {/* Client Routes */}
             <Route
               path="/*"
               element={
@@ -107,7 +103,13 @@ const App = () => {
                         <UploadPodcast />
                       </PrivateRoute>
                     } />
+                    <Route path="/categories" element={<CategoriesPage />} />
                     <Route path="/popular" element={<PopularPage />} />
+                    <Route path="/favorites" element={
+                      <PrivateRoute>
+                        <Favorites />
+                      </PrivateRoute>
+                    } />
                     
                   </Routes>
                 </ClientLayout>

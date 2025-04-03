@@ -7,14 +7,17 @@ import "../../styles/Login.css";
 import { toast } from 'react-toastify';
 
 const Login = () => {
-  const [credentials, setCredentials] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { setUser } = useContext(AuthContext);
+  const { setUser, setIsAuthenticated } = useContext(AuthContext);
 
   const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const location = useLocation();
@@ -26,8 +29,12 @@ const Login = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await authService.login(credentials);
+      const response = await authService.login({
+        email: formData.email.trim(),
+        password: formData.password
+      });
       setUser(response.user);
+      setIsAuthenticated(true);
       toast.success('Login successful!');
       navigate(redirectPath);
     } catch (err) {
@@ -52,7 +59,7 @@ const Login = () => {
             type="email"
             name="email"
             placeholder="Email"
-            value={credentials.email}
+            value={formData.email}
             onChange={handleChange}
             required
           />
@@ -64,7 +71,7 @@ const Login = () => {
             type="password"
             name="password"
             placeholder="Mật khẩu"
-            value={credentials.password}
+            value={formData.password}
             onChange={handleChange}
             required
           />
