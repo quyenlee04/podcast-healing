@@ -1,8 +1,6 @@
 import React, { useState, useRef } from "react";
 import ReactPlayer from "react-player";
 import { FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaStepForward, FaStepBackward, FaForward, FaBackward } from "react-icons/fa";
-import "../../styles/global.css";
-import "../../styles/podcast.css";
 import podcastService from "../../services/podcastService";
 
 const PodcastPlayer = ({ 

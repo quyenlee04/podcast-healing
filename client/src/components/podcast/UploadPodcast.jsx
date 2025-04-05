@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import podcastService from "../../services/podcastService";
 import categoryService from "../../services/categoryService";
-import "../../styles/global.css";
 
 const UploadPodcast = () => {
   const navigate = useNavigate();
@@ -86,12 +85,12 @@ const UploadPodcast = () => {
 
   return (
     <div className="upload-podcast-container">
-      <h2>Upload New Podcast</h2>
+      <h2>Tải lên Podcast</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Title</label>
+          <label>Tên podcast</label>
           <input
             type="text"
             name="title"
@@ -103,7 +102,7 @@ const UploadPodcast = () => {
         </div>
 
         <div className="form-group">
-          <label>Description</label>
+          <label>Mô tả</label>
           <textarea
             name="description"
             value={formData.description}
@@ -114,7 +113,7 @@ const UploadPodcast = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="category">Category *</label>
+          <label htmlFor="category">Thể loại *</label>
           <select
             id="category"
             name="category"
@@ -123,7 +122,7 @@ const UploadPodcast = () => {
             required
             className="form-control"
           >
-            <option value="">Select a category</option>
+            <option value="">Chọn thể loại</option>
             {categories.map((category) => (
               <option key={category._id} value={category._id}>
                 {category.name}
@@ -133,7 +132,7 @@ const UploadPodcast = () => {
         </div>
 
         <div className="form-group">
-          <label>Audio File (MP3)</label>
+          <label>Audio (MP3)</label>
           <input
             type="file"
             name="mp3"
@@ -145,7 +144,7 @@ const UploadPodcast = () => {
         </div>
 
         <div className="form-group">
-          <label>Cover Image</label>
+          <label>Ảnh bìa</label>
           <input
             type="file"
             name="coverImage"
@@ -157,7 +156,7 @@ const UploadPodcast = () => {
         </div>
 
         <div className="form-group">
-          <label>Visibility</label>
+          <label>Trạng thái</label>
           <select
             name="visibility"
             value={formData.visibility}
@@ -174,7 +173,7 @@ const UploadPodcast = () => {
           className="btn btn-primary"
           disabled={loading}
         >
-          {loading ? 'Uploading...' : 'Upload Podcast'}
+          {loading ? 'Uploading...' : 'Tải lên'}
         </button>
       </form>
     </div>

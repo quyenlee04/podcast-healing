@@ -4,7 +4,13 @@ const podcastService = {
   // Get all podcasts with optional filtering
   getPodcasts: async (params = {}) => {
     try {
-      const response = await api.get('/podcasts', { params });
+      const response = await api.get('/podcasts', { 
+        params: {
+          ...params,
+          search: params.search || '',
+          sort: params.sort || '-createdAt'
+        }
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch podcasts' };
@@ -39,25 +45,9 @@ const podcastService = {
   updatePodcast: async (id, podcastData) => {
     try {
       // Create FormData for file uploads
-      const formData = new FormData();
+  
       
-      // Add text fields
-      if (podcastData.title) formData.append('title', podcastData.title);
-      if (podcastData.description) formData.append('description', podcastData.description);
-      if (podcastData.category) formData.append('category', podcastData.category);
-      if (podcastData.tags) formData.append('tags', podcastData.tags);
-      if (podcastData.visibility) formData.append('visibility', podcastData.visibility);
-      
-      // Add files only if provided
-      if (podcastData.mp3File) {
-        formData.append('mp3', podcastData.mp3File);
-      }
-      
-      if (podcastData.coverImage) {
-        formData.append('coverImage', podcastData.coverImage);
-      }
-      
-      const response = await api.put(`/podcasts/${id}`, formData, {
+      const response = await api.put(`/podcasts/${id}`, podcastData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -79,17 +69,37 @@ const podcastService = {
 //   }
 // },
 
-// ... rest of your code ...
 getPodcastsByAuthor: async (authorId) => {
+  const token = localStorage.getItem('token');
   try {
-    const response = await api.get(`/podcasts/author/${authorId}`);
+    const response = await api.get(`/podcasts/author/${authorId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     return response.data;
   } catch (error) {
-    throw error.response?.data || { message: 'Failed to fetch user podcasts' };
+    if (error.response?.status === 401) {
+      // Không xóa token ở đây
+      throw error;
+    }
+    throw error;
+  }
+},
+searchPodcastsByName: async (searchTerm) => {
+  try {
+    const response = await api.get('/podcasts', { 
+      params: { 
+        search: searchTerm,
+        sort: '-createdAt'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to search podcasts' };
   }
 },
 
-// ... rest of the code ...
   // Delete a podcast
   deletePodcast: async (id) => {
     try {

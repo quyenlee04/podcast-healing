@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams , useNavigate} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import podcastService from "../../services/podcastService";
 import { usePlayerContext } from "../../context/PlayerContext";
 import PodcastPlayer from "./PodcastPlayer";
-import "../../styles/global.css";
-import "../../styles/podcast.css"; 
+import Comments from './Comments';
+
 import LikeButton from '../common/LikeButton';
 import { useContext } from 'react';
 import { AuthContext } from "../../context/AuthContext";
@@ -32,7 +32,7 @@ const PodcastDetail = ({ isSidebarOpen }) => {
         if (user && data.likes) {
           setIsLiked(data.likes.includes(user._id));
         }
-        
+
         if (!currentPodcast || currentPodcast._id !== data._id) {
           fetchRelatedPodcasts(data);
         }
@@ -56,11 +56,11 @@ const PodcastDetail = ({ isSidebarOpen }) => {
     try {
       const response = await podcastService.toggleLike(podcast._id);
       setIsLiked(response.liked);
-      
+
       // Update podcast likes count
       setPodcast(prev => ({
         ...prev,
-        likes: response.liked 
+        likes: response.liked
           ? [...(prev.likes || []), user._id]
           : (prev.likes || []).filter(id => id !== user._id)
       }));
@@ -75,15 +75,15 @@ const PodcastDetail = ({ isSidebarOpen }) => {
     if (path.startsWith('http')) return path;
     return `http://localhost:5000${path}`;
   };
-  
+
   const fetchRelatedPodcasts = async (podcastData) => {
     if (podcastData && podcastData.category) {
       try {
         // Get podcasts in the same category
-        const data = await podcastService.getPodcasts({ 
-          category: podcastData.category._id 
+        const data = await podcastService.getPodcasts({
+          category: podcastData.category._id
         });
-        
+
         const related = data.podcasts.filter(p => p._id !== podcastData._id);
         setRelatedPodcasts(related);
       } catch (err) {
@@ -91,12 +91,12 @@ const PodcastDetail = ({ isSidebarOpen }) => {
       }
     }
   };
-  
+
   const handlePlayPodcast = async () => {
     try {
       // Increment listen count when playing
       await podcastService.incrementListenCount(podcast._id);
-      
+
       if (currentPodcast && currentPodcast._id === podcast._id) {
         togglePlay();
       } else {
@@ -105,7 +105,7 @@ const PodcastDetail = ({ isSidebarOpen }) => {
     } catch (error) {
       console.error('Failed to update listen count:', error);
     }
-  
+
   };
 
   // Add cleanup for listen tracking
@@ -128,8 +128,8 @@ const PodcastDetail = ({ isSidebarOpen }) => {
   return (
     <div className={`podcast-detail ${isSidebarOpen ? '' : 'sidebar-closed'}`}>
       <div className="podcast-header">
-        <img 
-          src={getFullUrl(podcast.coverImage)} 
+        <img
+          src={getFullUrl(podcast.coverImage)}
           alt={podcast.title}
           className="podcast-cover"
           onError={(e) => {
@@ -145,15 +145,15 @@ const PodcastDetail = ({ isSidebarOpen }) => {
             {podcast.category && <span className="podcast-category">Category: {podcast.category.name}</span>}
             <span className="podcast-date">Published: {new Date(podcast.createdAt).toLocaleDateString()}</span>
           </div>
-          
+
           <div className="podcast-actions">
-            <button 
-              onClick={handlePlayPodcast} 
+            <button
+              onClick={handlePlayPodcast}
               className={`play-podcast-btn ${isCurrentlyPlaying ? 'playing' : ''}`}
             >
-              {isCurrentlyPlaying ? 'Pause Episode' : 'Play Episode'}
+              {isCurrentlyPlaying ? 'Dừng' : 'Phát'}
             </button>
-            <button 
+            <button
               className={`like-button ${isLiked ? 'liked' : ''}`}
               onClick={handleLike}
             >
@@ -162,27 +162,27 @@ const PodcastDetail = ({ isSidebarOpen }) => {
           </div>
         </div>
       </div>
-      
-      
+
+
       <div className="podcast-description">
         <h2>About this podcast</h2>
         <p>{podcast.description}</p>
       </div>
-      
+
       {relatedPodcasts.length > 0 && (
         <div className="related-podcasts">
           <h2>More from this category</h2>
           <div className="related-podcasts-grid">
             {relatedPodcasts.slice(0, 4).map(relatedPodcast => (
               <div key={relatedPodcast._id} className="related-podcast-card">
-                <img 
-                  src={getFullUrl(relatedPodcast.coverImage)} 
+                <img
+                  src={getFullUrl(relatedPodcast.coverImage)}
                   alt={relatedPodcast.title}
                   className="related-podcast-cover"
                 />
                 <div className="related-podcast-info">
                   <h3>{relatedPodcast.title}</h3>
-                  <button 
+                  <button
                     onClick={() => playPodcast(relatedPodcast, [podcast, ...relatedPodcasts])}
                     className="play-related-btn"
                   >
@@ -194,23 +194,8 @@ const PodcastDetail = ({ isSidebarOpen }) => {
           </div>
         </div>
       )}
-      
-      {podcast.comments && podcast.comments.length > 0 && (
-        <div className="podcast-comments">
-          <h2>Comments ({podcast.comments.length})</h2>
-          <ul className="comments-list">
-            {podcast.comments.map(comment => (
-              <li key={comment._id} className="comment-item">
-                <div className="comment-header">
-                  <span className="comment-author">{comment.user.username}</span>
-                  <span className="comment-date">{new Date(comment.createdAt).toLocaleDateString()}</span>
-                </div>
-                <p className="comment-text">{comment.text}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+
+      <Comments podcastId={id} />
       {/* <PodcastPlayer 
         audioUrl={getFullUrl(podcast.audioUrl)}
         title={podcast.title}

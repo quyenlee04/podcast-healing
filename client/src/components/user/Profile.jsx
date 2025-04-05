@@ -1,22 +1,61 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext,useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import authService from "../../services/authService";
 import Modal from "../common/Modal";
 import Button from "../common/Button";
 import { toast } from 'react-toastify';
-import "../../styles/Profile.css";
+
 
 const Profile = () => {
   const { user, updateUser } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-    firstName: user?.profile?.firstName || "",
-    lastName: user?.profile?.lastName || "",
-    bio: user?.profile?.bio || "",
+    firstName: "",
+    lastName: "",
+    bio: "",
     avatar: null
   });
 
+  // First useEffect to fetch profile data
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await authService.getProfile();
+        if (response.user) {
+          setFormData({
+            firstName: response.user.profile?.firstName || "",
+            lastName: response.user.profile?.lastName || "",
+            bio: response.user.profile?.bio || "",
+            avatar: null
+          });
+        }
+      } catch (error) {
+        console.error("Error loading profile:", error);
+        toast.error("Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  // Second useEffect to update form data when user changes
+  useEffect(() => {
+    if (user && user.profile) {
+      setFormData({
+        firstName: user.profile.firstName || "",
+        lastName: user.profile.lastName || "",
+        bio: user.profile.bio || "",
+        avatar: null
+      });
+    }
+  }, [user]);
+
+  // Remove the direct state update that was here
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -36,17 +75,30 @@ const Profile = () => {
     e.preventDefault();
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('firstName', formData.firstName);
-      formDataToSend.append('lastName', formData.lastName);
-      formDataToSend.append('bio', formData.bio);
+      
+      // Only append values that are not empty
+      if (formData.firstName?.trim()) {
+        formDataToSend.append('firstName', formData.firstName.trim());
+      }
+      if (formData.lastName?.trim()) {
+        formDataToSend.append('lastName', formData.lastName.trim());
+      }
+      if (formData.bio?.trim()) {
+        formDataToSend.append('bio', formData.bio.trim());
+      }
       if (formData.avatar) {
         formDataToSend.append('avatar', formData.avatar);
       }
 
-      await authService.updateProfile(formDataToSend);
-      await updateUser();
-      setIsEditing(false);
-      toast.success('Profile updated successfully');
+
+      const response = await authService.updateProfile(formDataToSend);
+      if (response.user) {
+        updateUser(response.user);
+        setIsEditing(false);
+        toast.success('Cập nhật thông tin thành công!');
+      } else {
+        toast.error('Failed to update profile');
+      }
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error('Failed to update profile');
@@ -62,6 +114,13 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
+      {loading ? (
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      ): (
       <div className="profile-header">
         <img 
           src={getAvatarUrl(user?.profile?.avatar)} 
@@ -74,11 +133,12 @@ const Profile = () => {
         />
         <h2>{user?.username}</h2>
       </div>
+      )}
 
       {isEditing ? (
         <form onSubmit={handleSubmit} className="profile-form">
           <div className="form-group">
-            <label>First Name</label>
+            <label>Họ</label>
             <input
               type="text"
               name="firstName"
@@ -88,7 +148,7 @@ const Profile = () => {
             />
           </div>
           <div className="form-group">
-            <label>Last Name</label>
+            <label>Tên</label>
             <input
               type="text"
               name="lastName"
@@ -98,7 +158,7 @@ const Profile = () => {
             />
           </div>
           <div className="form-group">
-            <label>Bio</label>
+            <label>Giới thiệu</label>
             <textarea
               name="bio"
               value={formData.bio}
@@ -128,7 +188,7 @@ const Profile = () => {
           <p><strong>Last Name:</strong> {user?.profile?.lastName || "Not set"}</p>
           <p><strong>Bio:</strong> {user?.profile?.bio || "No bio yet"}</p>
           <Button text="Edit Profile" onClick={() => setIsEditing(true)} className="primary-btn" />
-          <Button text="Delete Account" onClick={() => setShowModal(true)} className="danger-btn" />
+        
         </div>
       )}
 

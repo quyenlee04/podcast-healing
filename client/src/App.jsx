@@ -26,6 +26,23 @@ import PodcastDetail from "./components/podcast/PodcastDetail";
 import PodcastList from "./components/podcast/PodcastList";
 import CategoriesPage from "./pages/CategoriesPage";
 import Favorites from "./components/user/Favorites";
+
+
+import './styles/main.css';
+import './styles/components/header.css';
+import './styles/components/footer.css';
+import './styles/components/sidebar.css';
+import './styles/components/globalPlayer.css';
+import './styles/components/podcastDetail.css';
+import './styles/components/podcastList.css';
+import './styles/components/login.css';
+import './styles/components/register.css';
+import './styles/components/uploadPodcast.css';
+import './styles/components/favorites.css';
+import './styles/pages/homePage.css';
+import './styles/pages/popularPage.css';
+import './styles/components/profile.css';
+import "./styles/pages/categoriesPage.css";
 // Layoutse
 const AdminLayout = ({ children }) => {
   return <div className="admin-layout">{children}</div>;

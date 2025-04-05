@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import categoryService from "../services/categoryService";
-import "../styles/CategoriesPage.css";
+
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);

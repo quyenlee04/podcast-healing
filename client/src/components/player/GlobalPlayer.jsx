@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import ReactPlayer from "react-player";
 import { FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaStepForward, FaStepBackward, FaForward, FaBackward, FaTimes } from "react-icons/fa";
 import { usePlayerContext } from "../../context/PlayerContext";
-import "../../styles/GlobalPlayer.css";
+
 
 const GlobalPlayer = () => {
   const {

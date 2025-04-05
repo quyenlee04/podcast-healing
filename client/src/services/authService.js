@@ -73,6 +73,7 @@ const authService = {
                     'Content-Type': 'multipart/form-data'
                 }
             });
+            
 
             // Update user in localStorage
             if (response.data.user) {
@@ -84,6 +85,14 @@ const authService = {
             throw error.response?.data || { message: 'Failed to update profile' };
         }
     },
+    getProfile: async () => {
+        try {
+          const response = await api.get('/users/profile');
+          return response.data;
+        } catch (error) {
+          throw error.response?.data || { message: 'Failed to fetch profile' };
+        }
+      },
     getAllUsers: async () => {
         try {
             const response = await api.get('/users');
@@ -94,6 +103,10 @@ const authService = {
     },
 
     updateUser: async (userId, userData) => {
+        if (!userId) {
+            console.error("Lỗi: userId không hợp lệ!");
+            return Promise.reject(new Error("User ID is required"));
+          }
         try {
             const response = await api.put(`/users/${userId}`, userData);
             return response.data;

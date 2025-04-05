@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { FaPlay, FaPause } from "react-icons/fa";
-import "../../styles/global.css";
-import "../../styles/podcast.css";
 import podcastService from "../../services/podcastService";
 import { usePlayerContext } from "../../context/PlayerContext";
 
@@ -10,15 +8,16 @@ const PodcastList = () => {
   const [podcasts, setPodcasts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchParams] = useSearchParams();
   const { playPodcast, currentPodcast, isPlaying, togglePlay } = usePlayerContext();
-
+  const searchTerm = searchParams.get('search');
   useEffect(() => {
     const fetchPodcasts = async () => {
       try {
         setLoading(true);
-        const data = await podcastService.getPodcasts();
+        const searchTerm = searchParams.get('search');
+        const data = await podcastService.getPodcasts({ search: searchTerm });
         setPodcasts(data.podcasts || []);
-        console.log("Podcasts data:", data.podcasts);
       } catch (err) {
         console.error("Error fetching podcasts:", err);
         setError("Failed to load podcasts. Please try again later.");
@@ -28,7 +27,7 @@ const PodcastList = () => {
     };
 
     fetchPodcasts();
-  }, []);
+  }, [searchParams]); // Add searchParams as dependency
 
   // Helper function to format image URLs
   const getImageUrl = (imagePath) => {
@@ -67,11 +66,17 @@ const PodcastList = () => {
 
   return (
     <div className="podcast-list-container">
-      <h1 className="page-title">Explore Podcasts</h1>
+      <h1 className="page-title">
+        {searchTerm ? `Search Results for "${searchTerm}"` : 'Danh Sách Podcasts'}
+      </h1>
 
       {podcasts.length === 0 ? (
         <div className="no-podcasts">
-          <p>No podcasts found. Check back later for new content!</p>
+          <p>
+            {searchTerm 
+              ? `No podcasts found for "${searchTerm}"`
+              : 'No podcasts found. Check back later for new content!'}
+          </p>
         </div>
       ) : (
         <div className="podcast-grid">

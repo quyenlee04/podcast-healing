@@ -6,7 +6,7 @@ const fs = require('fs');
 const { register, login, getUserById, getAllUsers,updateUser,updateUsers, updateProfile, deleteUser } = require('../controllers/userController');
 const { validateRegistration, validateLogin } = require('../middleware/validationMiddleware');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
-
+const User=  require ('../models/User');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -40,6 +40,17 @@ const upload = multer({
     }
 });
 
+router.get('/profile', protect, async (req, res) => {
+    try {
+      const user = await User.findById(req.user._id).select('-password');
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.json({ user });
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  });
 
 router.post('/register', validateRegistration, register);
 router.post('/login', validateLogin, login);
@@ -50,5 +61,6 @@ router.delete('/:id', protect, adminOnly, deleteUser);
 router.get('/', protect, adminOnly, getAllUsers);
 router.get('/favorites/:userId', protect, getUserById);
 
+// Add this route before other routes
 
 module.exports = router;
