@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
-import "../../styles/Favorites.css";
+
 import podcastService from "../../services/podcastService";
 
 const Favorites = () => {
@@ -38,7 +38,7 @@ const Favorites = () => {
 
   return (
     <div className="favorites-container">
-      <h2>Your Favorite Podcasts</h2>
+      <h2>Podcasts yêu thích của bạn</h2>
       {favorites.length > 0 ? (
         <div className="favorites-grid">
           {favorites.map((podcast) => (

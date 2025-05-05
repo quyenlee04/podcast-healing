@@ -73,6 +73,7 @@ const authService = {
                     'Content-Type': 'multipart/form-data'
                 }
             });
+            
 
             // Update user in localStorage
             if (response.data.user) {

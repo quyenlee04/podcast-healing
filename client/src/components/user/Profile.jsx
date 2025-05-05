@@ -4,7 +4,7 @@ import authService from "../../services/authService";
 import Modal from "../common/Modal";
 import Button from "../common/Button";
 import { toast } from 'react-toastify';
-import "../../styles/Profile.css";
+
 
 const Profile = () => {
   const { user, updateUser } = useContext(AuthContext);
@@ -36,17 +36,30 @@ const Profile = () => {
     e.preventDefault();
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('firstName', formData.firstName);
-      formDataToSend.append('lastName', formData.lastName);
-      formDataToSend.append('bio', formData.bio);
+      
+      // Only append values that are not empty
+      if (formData.firstName?.trim()) {
+        formDataToSend.append('firstName', formData.firstName.trim());
+      }
+      if (formData.lastName?.trim()) {
+        formDataToSend.append('lastName', formData.lastName.trim());
+      }
+      if (formData.bio?.trim()) {
+        formDataToSend.append('bio', formData.bio.trim());
+      }
       if (formData.avatar) {
         formDataToSend.append('avatar', formData.avatar);
       }
 
-      await authService.updateProfile(formDataToSend);
-      await updateUser();
-      setIsEditing(false);
-      toast.success('Profile updated successfully');
+
+      const response = await authService.updateProfile(formDataToSend);
+      if (response.user) {
+        updateUser(response.user);
+        setIsEditing(false);
+        toast.success('Cập nhật thông tin thành công!');
+      } else {
+        toast.error('Failed to update profile');
+      }
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error('Failed to update profile');
@@ -78,7 +91,7 @@ const Profile = () => {
       {isEditing ? (
         <form onSubmit={handleSubmit} className="profile-form">
           <div className="form-group">
-            <label>First Name</label>
+            <label>Họ</label>
             <input
               type="text"
               name="firstName"
@@ -88,7 +101,7 @@ const Profile = () => {
             />
           </div>
           <div className="form-group">
-            <label>Last Name</label>
+            <label>Tên</label>
             <input
               type="text"
               name="lastName"
@@ -98,7 +111,7 @@ const Profile = () => {
             />
           </div>
           <div className="form-group">
-            <label>Bio</label>
+            <label>Giới thiệu</label>
             <textarea
               name="bio"
               value={formData.bio}
@@ -128,7 +141,7 @@ const Profile = () => {
           <p><strong>Last Name:</strong> {user?.profile?.lastName || "Not set"}</p>
           <p><strong>Bio:</strong> {user?.profile?.bio || "No bio yet"}</p>
           <Button text="Edit Profile" onClick={() => setIsEditing(true)} className="primary-btn" />
-          <Button text="Delete Account" onClick={() => setShowModal(true)} className="danger-btn" />
+        
         </div>
       )}
 

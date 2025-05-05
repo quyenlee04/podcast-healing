@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import UserManagement from "./UserManagement";
 import PodcastManagement from "./PodcastManagement";
 import CategoryManagement from "./CategoryManagement";
-import "../../styles/Admin.css";
+
 import { Link } from "react-router-dom";
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('users');

@@ -3,7 +3,7 @@ import { FaUser, FaLock, FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../../services/authService";
 import { AuthContext } from "../../context/AuthContext";
-import "../../styles/Register.css";
+
 
 const Register = () => {
   const [formData, setFormData] = useState({

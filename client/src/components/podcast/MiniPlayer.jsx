@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FaPlay, FaPause } from "react-icons/fa";
 import { usePlayerContext } from "../../context/PlayerContext";
-import "../../styles/MiniPlayer.css";
+import "../../styles/components/miniPlayer.css"; 
 
 const MiniPlayer = ({ podcast }) => {
   const { playPodcast, currentPodcast, isPlaying, togglePlay } = usePlayerContext();

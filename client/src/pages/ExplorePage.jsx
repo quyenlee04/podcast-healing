@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/ExplorePage.css";
+
 
 const ExplorePage = ({ isSidebarOpen }) => {
   return (

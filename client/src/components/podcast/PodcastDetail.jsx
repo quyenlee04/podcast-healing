@@ -3,8 +3,7 @@ import { useParams , useNavigate} from "react-router-dom";
 import podcastService from "../../services/podcastService";
 import { usePlayerContext } from "../../context/PlayerContext";
 import PodcastPlayer from "./PodcastPlayer";
-import "../../styles/global.css";
-import "../../styles/podcast.css"; 
+
 import LikeButton from '../common/LikeButton';
 import { useContext } from 'react';
 import { AuthContext } from "../../context/AuthContext";

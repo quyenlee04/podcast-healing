@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import podcastService from "../services/podcastService";
 import MiniPlayer from "../components/podcast/MiniPlayer";
-import "../styles/PopularPage.css";
 
 const PopularPage = () => {
   const [podcasts, setPodcasts] = useState([]);
@@ -12,11 +11,19 @@ const PopularPage = () => {
     const fetchPopularPodcasts = async () => {
       try {
         setLoading(true);
-        const response = await podcastService.getPodcasts({ 
+        // Get all podcasts and sort by listen count
+        const response = await podcastService.getPodcasts({
           sort: '-listenCount',
-          limit: 3 // Limit to top 3 podcasts
+          limit: 10 // Get more podcasts to ensure we have enough valid ones
         });
-        setPodcasts(response.podcasts || []);
+
+        // Filter and sort podcasts by listen count
+        const sortedPodcasts = response.podcasts
+          .filter(podcast => podcast.listenCount > 0) // Only include podcasts with listens
+          .sort((a, b) => b.listenCount - a.listenCount) // Sort by listen count
+          .slice(0, 3); // Get top 3
+
+        setPodcasts(sortedPodcasts);
       } catch (err) {
         console.error('Error fetching popular podcasts:', err);
         setError('Failed to load popular podcasts');
@@ -33,14 +40,15 @@ const PopularPage = () => {
 
   return (
     <div className="popular-page">
-      <h1>Top 3 Popular Podcasts</h1>
+      <h1>Top 3 podcasts thịnh hành</h1>
       <div className="popular-grid">
         {podcasts.map((podcast, index) => (
           <div key={podcast._id} className="popular-item">
             <div className={`rank-badge rank-${index + 1}`}>#{index + 1}</div>
             <MiniPlayer podcast={podcast} />
             <div className="listen-count">
-              {podcast.listenCount || 0} listens
+              <span className="listen-number">{podcast.listenCount.toLocaleString()}</span>
+              <span className="listen-text">lượt nghe</span>
             </div>
           </div>
         ))}

@@ -4,7 +4,13 @@ const podcastService = {
   // Get all podcasts with optional filtering
   getPodcasts: async (params = {}) => {
     try {
-      const response = await api.get('/podcasts', { params });
+      const response = await api.get('/podcasts', { 
+        params: {
+          ...params,
+          search: params.search || '',
+          sort: params.sort || '-createdAt'
+        }
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch podcasts' };
@@ -82,10 +88,27 @@ const podcastService = {
 // ... rest of your code ...
 getPodcastsByAuthor: async (authorId) => {
   try {
-    const response = await api.get(`/podcasts/author/${authorId}`);
+    const response = await api.get(`/podcasts/author/${authorId}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: 'Failed to fetch user podcasts' };
+  }
+},// Add this method to the existing podcastService object
+searchPodcastsByName: async (searchTerm) => {
+  try {
+    const response = await api.get('/podcasts', { 
+      params: { 
+        search: searchTerm,
+        sort: '-createdAt'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to search podcasts' };
   }
 },
 

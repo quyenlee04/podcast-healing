@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUser, FaLock } from "react-icons/fa";
 import authService from "../../services/authService";
 import { AuthContext } from "../../context/AuthContext";
-import "../../styles/Login.css";
+
 import { toast } from 'react-toastify';
 
 const Login = () => {
@@ -35,11 +35,11 @@ const Login = () => {
       });
       setUser(response.user);
       setIsAuthenticated(true);
-      toast.success('Login successful!');
+      toast.success('Đăng nhập thành công!');
       navigate(redirectPath);
     } catch (err) {
-      setError(err.message || "Login failed. Please check your credentials.");
-      toast.error(err.message || "Login failed. Please check your credentials.");
+      setError(err.message || "Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn.");
+      toast.error(err.message || "Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn.");
     } finally {
       setLoading(false);
     }
@@ -88,9 +88,9 @@ const Login = () => {
         <p className="register-link">
           Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
         </p>
-        <p className="forgot-password">
+        {/* <p className="forgot-password">
           <Link to="/reset-password">Quên mật khẩu?</Link>
-        </p>
+        </p> */}
       </form>
     </div>
   );

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import podcastService from "../../services/podcastService";
 import { toast } from "react-toastify";
-import "../../styles/UserPodcasts.css";
+
 
 const UserPodcasts = () => {
   const [podcasts, setPodcasts] = useState([]);
@@ -107,7 +107,6 @@ const UserPodcasts = () => {
 };
 
 export default UserPodcasts;
-
 // ... existing imports ...
 
 // const UserPodcasts = () => {

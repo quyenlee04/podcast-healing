@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import podcastService from "../services/podcastService";
 import categoryService from "../services/categoryService";
 import MiniPlayer from "../components/podcast/MiniPlayer";
-import "../styles/HomePage.css";
+
 
 const HomePage = () => {
   const [featuredPodcasts, setFeaturedPodcasts] = useState([]);
@@ -52,8 +52,6 @@ const HomePage = () => {
           <Link to="/podcasts" className="browse-button">Browse All Podcasts</Link>
         </div>
       </section>
-
-      {/* Featured Podcasts - Limited to 3 */}
       {featuredPodcasts.length > 0 && (
         <section className="featured-section">
           <h2 className="section-title">Featured Podcasts</h2>
