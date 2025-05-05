@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext,useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import authService from "../../services/authService";
 import Modal from "../common/Modal";
@@ -10,13 +10,52 @@ const Profile = () => {
   const { user, updateUser } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-    firstName: user?.profile?.firstName || "",
-    lastName: user?.profile?.lastName || "",
-    bio: user?.profile?.bio || "",
+    firstName: "",
+    lastName: "",
+    bio: "",
     avatar: null
   });
 
+  // First useEffect to fetch profile data
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await authService.getProfile();
+        if (response.user) {
+          setFormData({
+            firstName: response.user.profile?.firstName || "",
+            lastName: response.user.profile?.lastName || "",
+            bio: response.user.profile?.bio || "",
+            avatar: null
+          });
+        }
+      } catch (error) {
+        console.error("Error loading profile:", error);
+        toast.error("Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  // Second useEffect to update form data when user changes
+  useEffect(() => {
+    if (user && user.profile) {
+      setFormData({
+        firstName: user.profile.firstName || "",
+        lastName: user.profile.lastName || "",
+        bio: user.profile.bio || "",
+        avatar: null
+      });
+    }
+  }, [user]);
+
+  // Remove the direct state update that was here
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -75,6 +114,13 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
+      {loading ? (
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      ): (
       <div className="profile-header">
         <img 
           src={getAvatarUrl(user?.profile?.avatar)} 
@@ -87,6 +133,7 @@ const Profile = () => {
         />
         <h2>{user?.username}</h2>
       </div>
+      )}
 
       {isEditing ? (
         <form onSubmit={handleSubmit} className="profile-form">

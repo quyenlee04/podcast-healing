@@ -3,7 +3,11 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+<<<<<<< HEAD
 const {createPodcast, getPodcasts, getLikedPodcasts,getPodcastsByAuthor, getSinglePodcast, incrementListenCount,updatePodcast, deletePodcast, toggleLike, addComment, deleteComment , getPopularPodcasts} = require('../controllers/podcastController');
+=======
+const {createPodcast, getPodcasts, getLikedPodcasts,getPodcastsByAuthor, getSinglePodcast, incrementListenCount,updatePodcast, deletePodcast, toggleLike, addComment, getComments,deleteComment , getPopularPodcasts} = require('../controllers/podcastController');
+>>>>>>> 86a5ea1ee0e912854d8f54310f17be07b34153ff
 const { protect } = require('../middleware/authMiddleware');
 
 // Set up multer storage for uploads
@@ -82,8 +86,9 @@ router.get('/:id', protect, getSinglePodcast);
 router.put('/:id', protect, uploadFields, updatePodcast);
 router.delete('/:id', protect, deletePodcast);
 router.post('/:id/like', protect, toggleLike);
-router.post('/:id/comment', protect, addComment);
-router.delete('/:id/comment/:commentId', protect, deleteComment);
+router.post('/:id/comments', protect, addComment);
+router.get('/:id/comments', protect,getComments);
+router.delete('/:id/comments/:commentId', protect, deleteComment);
 router.post('/:id/increment-listen', incrementListenCount);
 
 module.exports = router;

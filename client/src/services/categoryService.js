@@ -40,6 +40,7 @@ const categoryService = {
       const response = await api.put(`/categories/${id}`, categoryData, {
         headers: {
           'Content-Type': 'multipart/form-data'
+
         }
       });
       return response.data;

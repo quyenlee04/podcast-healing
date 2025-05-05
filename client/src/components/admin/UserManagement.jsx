@@ -21,6 +21,7 @@ const UserManagement = () => {
     try {
       const response = await authService.getAllUsers();
       setUsers(response.users);
+      console.log("Fetched users:", response.users);
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -34,33 +35,68 @@ const UserManagement = () => {
       [e.target.name]: e.target.value
     });
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (editingUser) {
-        await authService.updateUser(editingUser.id, formData);
-      } else {
-        await authService.register(formData);
-      }
-      fetchUsers();
-      handleCloseModal();
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
-    }
-  };
-
   const handleEdit = (user) => {
     setEditingUser(user);
     setFormData({
       username: user.username,
       email: user.email,
       role: user.role,
-      password: '' 
+      password: '',
     });
     setShowModal(true);
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Validate required fields
+      if (!formData.username || !formData.email) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        alert('Please enter a valid email address');
+        return;
+      }
+
+      if (editingUser) {
+        // For update, only send changed fields
+        const updateData = {
+          username: formData.username,
+          email: formData.email,
+          role: formData.role
+        };
+        // Only include password if it was changed
+        if (formData.password) {
+          updateData.password = formData.password;
+        }
+        if (!editingUser || !(editingUser.id || editingUser._id)) {
+          alert("Lỗi: Không tìm thấy ID người dùng!");
+          return;
+        }
+        await authService.updateUser(editingUser.id, updateData);
+      } else {
+        // For new user, send all required fields
+        await authService.register({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role
+        });
+      }
+
+      await fetchUsers();
+      handleCloseModal();
+    } catch (err) {
+      console.error('Error:', err);
+      alert(err.response?.data?.message || 'An error occurred while saving the user');
+    }
+  };
+
+
 
   const handleDelete = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
@@ -112,7 +148,7 @@ const UserManagement = () => {
           </thead>
           <tbody>
             {users.map(user => (
-              <tr key={user.id}>
+              <tr key={user._id}>
                 <td>{user.username}</td>
                 <td>{user.email}</td>
                 <td>
@@ -122,15 +158,15 @@ const UserManagement = () => {
                 </td>
                 <td>
                   <div className="btn-group">
-                    <button 
+                    <button
                       className="btn btn-sm btn-outline-info"
                       onClick={() => handleEdit(user)}
                     >
                       <i className="bi bi-pencil"></i>
                     </button>
-                    <button 
+                    <button
                       className="btn btn-sm btn-outline-danger"
-                      onClick={() => handleDelete(user.id)}
+                      onClick={() => handleDelete(user._id)}
                     >
                       <i className="bi bi-trash"></i>
                     </button>

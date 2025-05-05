@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import podcastService from "../../services/podcastService";
 import categoryService from "../../services/categoryService";
-import { toast } from 'react-toastify';
-
 
 const PodcastManagement = () => {
   const [podcasts, setPodcasts] = useState([]);
@@ -15,7 +13,7 @@ const PodcastManagement = () => {
     description: '',
     category: '',
     visibility: 'public',
-    mp3: null,
+    audioFile: null,
     coverImage: null
   });
 
@@ -44,40 +42,55 @@ const PodcastManagement = () => {
       setCategories([]); // Set empty array on error
     }
   };
-  // Update the handleAdd button click in the JSX
-  // <button className="btn btn-primary" onClick={handleAdd}>
-  //   <i className="bi bi-plus-lg me-2"></i>Add Podcast
-  // </button>
 
-  // Update handleInputChange function
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
-      if (name === 'audioFile') {
-        setFormData(prev => ({ ...prev, mp3: files[0] }));
-      } else {
-        setFormData(prev => ({ ...prev, [name]: files[0] }));
-      }
+      setFormData({
+        ...formData,
+        [name]: files[0]
+      });
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData({
+        ...formData,
+        [name]: value
+      });
     }
   };
 
-  // Update handleEdit function
-  const handleEdit = (podcast) => {
-    setEditingPodcast(podcast);
-    setFormData({
-      title: podcast.title,
-      description: podcast.description,
-      category: podcast.category._id || '',
-      visibility: podcast.visibility,
-      mp3: null,         // Changed from audioFile to mp3
-      coverImage: null
-    });
-    setShowModal(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formDataToSend = new FormData();
+
+      // Add text fields with correct field names
+      formData.title && formDataToSend.append('title', formData.title);
+      formData.description && formDataToSend.append('description', formData.description);
+      formData.category && formDataToSend.append('category', formData.category);
+      formData.visibility && formDataToSend.append('visibility', formData.visibility);
+
+      // Add files with correct field names
+      if (formData.audioFile) {
+        formDataToSend.append('mp3', formData.audioFile);
+      }
+      if (formData.coverImage) {
+        formDataToSend.append('coverImage', formData.coverImage);
+      }
+
+      if (editingPodcast) {
+        await podcastService.updatePodcast(editingPodcast._id, formDataToSend);
+      } else {
+        await podcastService.createPodcast(formDataToSend);
+      }
+
+      fetchPodcasts();
+      handleCloseModal();
+    } catch (error) {
+      console.error(error);
+      alert(error.message || 'Failed to save podcast');
+    }
   };
 
-  // Update handleCloseModal function
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingPodcast(null);
@@ -86,52 +99,20 @@ const PodcastManagement = () => {
       description: '',
       category: '',
       visibility: 'public',
-      mp3: null,         // Changed from audioFile to mp3
+      audioFile: null,
       coverImage: null
     });
   };
 
-  // Update handleSubmit function
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      if (!formData.title || !formData.description || !formData.category) {
-        toast.error('Please fill in all required fields');
-        return;
-      }
-
-      const formDataToSend = new FormData();
-      formDataToSend.append('title', formData.title);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('category', formData.category);
-      formDataToSend.append('visibility', formData.visibility);
-
-      if (!editingPodcast) {
-        // For new podcast
-        if (!formData.mp3 || !formData.coverImage) {
-          toast.error('Please upload both audio and cover image files');
-          return;
-        }
-        formDataToSend.append('mp3', formData.mp3);
-        formDataToSend.append('coverImage', formData.coverImage);
-
-        await podcastService.createPodcast(formDataToSend);
-      } else {
-        // For editing
-        if (formData.mp3) formDataToSend.append('mp3File', formData.mp3);
-        if (formData.coverImage) formDataToSend.append('coverImage', formData.coverImage);
-
-        await podcastService.updatePodcast(editingPodcast._id, formDataToSend);
-      }
-
-      await fetchPodcasts(); // Refresh the list
-      handleCloseModal();
-      toast.success(`Podcast ${editingPodcast ? 'updated' : 'created'} successfully`);
-    } catch (error) {
-      console.error('Error saving podcast:', error);
-      toast.error(error.message || 'Failed to save podcast');
-    }
+  const handleEdit = (podcast) => {
+    setEditingPodcast(podcast);
+    setFormData({
+      title: podcast.title,
+      description: podcast.description,
+      category: podcast.category._id,
+      visibility: podcast.visibility
+    });
+    setShowModal(true);
   };
 
   const handleDelete = async (podcastId) => {
@@ -185,10 +166,9 @@ const PodcastManagement = () => {
                 </td>
                 <td>
                   <div className="btn-group">
-
                     <button
                       className="btn btn-sm btn-outline-info"
-                      onClick={() => handleEdit(podcast)} // Change from handleUpdate to handleEdit
+                      onClick={() => handleEdit(podcast)}
                     >
                       <i className="bi bi-pencil"></i>
                     </button>
@@ -239,7 +219,7 @@ const PodcastManagement = () => {
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Category</label>
-
+                  // In the select element, update the categories.map:
                   <select
                     className="form-select"
                     name="category"
@@ -267,35 +247,32 @@ const PodcastManagement = () => {
                     <option value="private">Private</option>
                   </select>
                 </div>
-                {/* Remove the !editingPodcast condition to allow file uploads during edit */}
-                <div className="mb-3">
-                  <label className="form-label">Audio File (MP3)</label>
-                  <input
-                    type="file"
-                    className="form-control"
-                    name="audioFile"
-                    accept="audio/mpeg,audio/mp3"
-                    onChange={handleInputChange}
-                    required={!editingPodcast} // Only required for new podcasts
-                  />
-                  {editingPodcast && (
-                    <small className="text-muted">Leave empty to keep the current audio file</small>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Cover Image</label>
-                  <input
-                    type="file"
-                    className="form-control"
-                    name="coverImage"
-                    accept="image/*"
-                    onChange={handleInputChange}
-                    required={!editingPodcast} // Only required for new podcasts
-                  />
-                  {editingPodcast && (
-                    <small className="text-muted">Leave empty to keep the current cover image</small>
-                  )}
-                </div>
+                {!editingPodcast && (
+                  <>
+                    <div className="mb-3">
+                      <label className="form-label">Audio File (MP3)</label>
+                      <input
+                        type="file"
+                        className="form-control"
+                        name="audioFile"
+                        accept="audio/mpeg,audio/mp3"
+                        onChange={handleInputChange}
+                        required={!editingPodcast}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Cover Image</label>
+                      <input
+                        type="file"
+                        className="form-control"
+                        name="coverImage"
+                        accept="image/*"
+                        onChange={handleInputChange}
+                        required={!editingPodcast}
+                      />
+                    </div>
+                  </>
+                )}
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
                     Cancel

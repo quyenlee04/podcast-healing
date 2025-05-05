@@ -1,0 +1,172 @@
+/* Main comments container */
+.comments-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+}
+
+/* Comments section title */
+.comments-section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #2D3436;
+  border-bottom: 2px solid #f1f3f5;
+  padding-bottom: 1rem;
+}
+
+/* Comment form styling */
+.comment-form {
+  margin-bottom: 2rem;
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.comment-form textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.comment-form textarea:focus {
+  border-color: #FF6B6B;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+.comment-form button {
+  background-color: #FF6B6B;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.comment-form button:hover {
+  background-color: #FF5252;
+  transform: translateY(-1px);
+}
+
+/* Comments list container */
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Individual comment styling */
+.comment {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  transition: transform 0.3s ease;
+}
+
+.comment:hover {
+  transform: translateY(-2px);
+}
+
+/* Comment header with user info and date */
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* User information container */
+.comment-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* User avatar styling */
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #FF6B6B;
+}
+
+.comment-author {
+  font-weight: 600;
+  color: #2D3436;
+}
+
+.comment-date {
+  color: #636E72;
+  font-size: 0.9rem;
+}
+
+/* Comment text content */
+.comment-text {
+  color: #2D3436;
+  line-height: 1.6;
+  margin: 0.75rem 0;
+}
+
+/* Delete comment button */
+.delete-comment {
+  background: none;
+  border: none;
+  color: #FF6B6B;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  transition: color 0.3s ease;
+}
+
+.delete-comment:hover {
+  color: #FF5252;
+  text-decoration: underline;
+}
+
+/* Empty state message */
+.no-comments {
+  text-align: center;
+  color: #636E72;
+  padding: 3rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  font-size: 1.1rem;
+}
+
+/* Loading state */
+.comments-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #636E72;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .comments-section {
+    padding: 1rem 0.5rem;
+  }
+
+  .comment {
+    padding: 1rem;
+  }
+
+  .comment-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .comment-form {
+    padding: 1rem;
+  }
+}

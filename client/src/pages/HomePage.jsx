@@ -47,9 +47,9 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
-          <h1>Discover and Listen to Amazing Podcasts</h1>
-          <p>Stream the best podcasts for healing, meditation, and personal growth</p>
-          <Link to="/podcasts" className="browse-button">Browse All Podcasts</Link>
+          <h1>Khám phá và lắng nghe những Podcast tuyệt vời</h1>
+          <p>Truyền phát các podcast hay nhất về chữa lành, thiền định và phát triển bản thân</p>
+          <Link to="/podcasts" className="browse-button">Tất cả Podcasts</Link>
         </div>
       </section>
       {featuredPodcasts.length > 0 && (
@@ -87,25 +87,25 @@ const HomePage = () => {
 
       {/* About Section */}
       <section className="about-section">
-        <h2 className="section-title">About Podcast Healing</h2>
+        <h2 className="section-title">Giới thiệu về Podcast Healing</h2>
         <div className="about-content">
           <div className="about-text">
-            <p>Welcome to Podcast Healing, your sanctuary for mindfulness and personal growth. We curate the best podcasts focused on meditation, healing, and spiritual wellness.</p>
+            <p>Chào mừng đến với Podcast Healing, không gian yên bình để bạn rèn luyện chánh niệm và phát triển bản thân. Chúng tôi chọn lọc những podcast chất lượng nhất, tập trung vào thiền định, chữa lành và sự an yên trong tâm hồn.</p>
             <div className="about-features">
               <div className="feature">
                 <i className="bi bi-heart-fill"></i>
-                <h3>Curated Content</h3>
-                <p>Carefully selected podcasts for your well-being journey</p>
+                <h3>Nội dung tuyển chọn</h3>
+                <p>Những podcast được tuyển chọn kỹ lưỡng dành cho hành trình chăm sóc sức khỏe tinh thần của bạn.</p>
               </div>
               <div className="feature">
                 <i className="bi bi-headphones"></i>
-                <h3>Quality Audio</h3>
-                <p>High-quality streaming for the best listening experience</p>
+                <h3>Trải nghiệm âm thanh đỉnh cao</h3>
+                <p>Thưởng thức âm thanh mượt mà với chất lượng phát trực tuyến hàng đầu.</p>
               </div>
               <div className="feature">
                 <i className="bi bi-people-fill"></i>
-                <h3>Community</h3>
-                <p>Join a community of like-minded individuals</p>
+                <h3>Cộng đồng</h3>
+                <p>Trở thành một phần của cộng đồng những người có cùng đam mê và mục tiêu.</p>
               </div>
             </div>
           </div>

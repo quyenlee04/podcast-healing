@@ -1,32 +1,47 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import podcastService from "../../services/podcastService";
 import { toast } from "react-toastify";
+<<<<<<< HEAD
 
+=======
+>>>>>>> 86a5ea1ee0e912854d8f54310f17be07b34153ff
 
 const UserPodcasts = () => {
   const [podcasts, setPodcasts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useContext(AuthContext);
-
-  useEffect(() => {
-    if (user && user._id) {
-      fetchUserPodcasts();
-    }
-  }, [user]);
+  const navigate = useNavigate();
 
   const fetchUserPodcasts = async () => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+
+    if (!token || !userData) {
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await podcastService.getPodcastsByAuthor(user._id);
+      const currentUser = JSON.parse(userData);
+      const response = await podcastService.getPodcastsByAuthor(currentUser._id);
       setPodcasts(response.podcasts || []);
     } catch (error) {
-      console.error("Error fetching user podcasts:", error);
-      toast.error(error.message || "Failed to load your podcasts");
+      console.error('Error:', error);
+      toast.error("Không thể tải podcast");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    fetchUserPodcasts();
+  }, []);
 
   const handleDelete = async (podcastId) => {
     if (window.confirm("Are you sure you want to delete this podcast?")) {
@@ -35,8 +50,11 @@ const UserPodcasts = () => {
         toast.success("Podcast deleted successfully");
         fetchUserPodcasts();
       } catch (error) {
-        console.error("Error deleting podcast:", error);
-        toast.error("Failed to delete podcast");
+        if (error.response?.status === 401) {
+          navigate('/login');
+        } else {
+          toast.error("Failed to delete podcast");
+        }
       }
     }
   };
@@ -66,7 +84,7 @@ const UserPodcasts = () => {
           {podcasts.map((podcast) => (
             <div key={podcast._id} className="podcast-card">
               <img
-                src={podcast.coverImage.startsWith('http') 
+                src={podcast.coverImage?.startsWith('http') 
                   ? podcast.coverImage 
                   : `http://localhost:5000${podcast.coverImage}`}
                 alt={podcast.title}
@@ -106,6 +124,7 @@ const UserPodcasts = () => {
   );
 };
 
+<<<<<<< HEAD
 export default UserPodcasts;
 // ... existing imports ...
 
@@ -134,3 +153,6 @@ export default UserPodcasts;
 
 //   // ... rest of your component ...
 // };
+=======
+export default UserPodcasts;
+>>>>>>> 86a5ea1ee0e912854d8f54310f17be07b34153ff
