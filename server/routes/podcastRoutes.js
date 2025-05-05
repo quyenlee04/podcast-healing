@@ -3,11 +3,15 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-<<<<<<< HEAD
+// <<<<<<< HEAD
+// <<<<<<< HEAD
+// const {createPodcast, getPodcasts, getLikedPodcasts,getPodcastsByAuthor, getSinglePodcast, incrementListenCount,updatePodcast, deletePodcast, toggleLike, addComment, deleteComment , getPopularPodcasts} = require('../controllers/podcastController');
+// =======
+// const {createPodcast, getPodcasts, getLikedPodcasts,getPodcastsByAuthor, getSinglePodcast, incrementListenCount,updatePodcast, deletePodcast, toggleLike, addComment, getComments,deleteComment , getPopularPodcasts} = require('../controllers/podcastController');
+// >>>>>>> 86a5ea1ee0e912854d8f54310f17be07b34153ff
+// =======
 const {createPodcast, getPodcasts, getLikedPodcasts,getPodcastsByAuthor, getSinglePodcast, incrementListenCount,updatePodcast, deletePodcast, toggleLike, addComment, deleteComment , getPopularPodcasts} = require('../controllers/podcastController');
-=======
-const {createPodcast, getPodcasts, getLikedPodcasts,getPodcastsByAuthor, getSinglePodcast, incrementListenCount,updatePodcast, deletePodcast, toggleLike, addComment, getComments,deleteComment , getPopularPodcasts} = require('../controllers/podcastController');
->>>>>>> 86a5ea1ee0e912854d8f54310f17be07b34153ff
+
 const { protect } = require('../middleware/authMiddleware');
 
 // Set up multer storage for uploads

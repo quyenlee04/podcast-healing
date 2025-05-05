@@ -74,11 +74,11 @@ getPodcastsByAuthor: async (authorId) => {
   try {
     const response = await api.get(`/podcasts/author/${authorId}`, {
       headers: {
-<<<<<<< HEAD
+
         'Authorization': `Bearer ${localStorage.getItem('token')}`
-=======
-        Authorization: `Bearer ${token}`
->>>>>>> 86a5ea1ee0e912854d8f54310f17be07b34153ff
+
+      
+
       }
     });
     return response.data;
@@ -90,6 +90,19 @@ getPodcastsByAuthor: async (authorId) => {
     throw error;
   }
 },
+searchPodcastsByName: async (searchTerm) => {
+  try {
+    const response = await api.get('/podcasts', { 
+      params: { 
+        search: searchTerm,
+        sort: '-createdAt'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to search podcasts' };
+  }
+},// Add this method to the existing podcastService object
 searchPodcastsByName: async (searchTerm) => {
   try {
     const response = await api.get('/podcasts', { 

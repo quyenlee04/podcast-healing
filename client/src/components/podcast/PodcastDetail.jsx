@@ -3,10 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import podcastService from "../../services/podcastService";
 import { usePlayerContext } from "../../context/PlayerContext";
 import PodcastPlayer from "./PodcastPlayer";
-<<<<<<< HEAD
-=======
+
 import Comments from './Comments';
->>>>>>> 86a5ea1ee0e912854d8f54310f17be07b34153ff
+
 
 import LikeButton from '../common/LikeButton';
 import { useContext } from 'react';

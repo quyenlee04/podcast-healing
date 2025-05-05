@@ -3,10 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import podcastService from "../../services/podcastService";
 import { toast } from "react-toastify";
-<<<<<<< HEAD
 
-=======
->>>>>>> 86a5ea1ee0e912854d8f54310f17be07b34153ff
 
 const UserPodcasts = () => {
   const [podcasts, setPodcasts] = useState([]);
@@ -124,7 +121,7 @@ const UserPodcasts = () => {
   );
 };
 
-<<<<<<< HEAD
+
 export default UserPodcasts;
 // ... existing imports ...
 
@@ -153,6 +150,4 @@ export default UserPodcasts;
 
 //   // ... rest of your component ...
 // };
-=======
-export default UserPodcasts;
->>>>>>> 86a5ea1ee0e912854d8f54310f17be07b34153ff
+
